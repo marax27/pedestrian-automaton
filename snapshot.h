@@ -10,6 +10,8 @@
 // - simulation constants.
 
 #include <vector>
+#include <string>
+
 #include "field.h"
 #include "pedestrian.h"
 
@@ -23,6 +25,8 @@ public:
 	std::vector<vec2> exits;
 
 	Field<fp_t> dynamic_field;
+
+	void readFromFile(const std::string &filename);
 
 private:
 	;
