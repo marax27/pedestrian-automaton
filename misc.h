@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#include "output.h"
+
 //************************************************************
 
 template<typename T>
@@ -24,5 +26,7 @@ namespace sim{
 
 	typedef Vec2D<index_t> vec2;
 }
+
+//************************************************************
 
 #endif  //_MISC_H_
