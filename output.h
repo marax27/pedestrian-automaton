@@ -25,7 +25,7 @@ public:
 	
 private:
 	template<typename T>
-	static str makeString(const T &arg)
+	static str formatString(const T &arg)
 	{
    		std::stringstream ss;
    		ss << arg;
@@ -38,7 +38,7 @@ private:
 		auto it = format.find("{}");
 		if( it == str::npos )
 			return format;
-		return format.replace( it, 2, makeString(arg) );
+		return format.replace( it, 2, formatString(arg) );
 	}
 
 	template<typename T, typename... Types>

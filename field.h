@@ -12,6 +12,7 @@ class Field{
 public:
 	typedef index_t size_type;
 
+	Field();
 	Field(size_type _size);
 	Field(Field &&model);
 	Field(const Field &model);
@@ -89,6 +90,12 @@ private:
 
 	void copyElements(const Field &model);
 };
+
+//************************************************************
+
+template<typename T>
+Field<T>::Field()
+	: data(nullptr), size(0), default_dummy_state(T()) {}
 
 //************************************************************
 
