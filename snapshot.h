@@ -28,8 +28,14 @@ public:
 
 	void readFromFile(const std::string &filename);
 
+	//------------------------------
+	class FileReadException : std::exception {
+		// ...
+	};
+	//------------------------------
+
 private:
-	;
+	
 };
 
 }
