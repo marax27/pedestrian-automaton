@@ -31,7 +31,7 @@ public:
 	void readFromFile(const std::string &filename);
 
 	//------------------------------
-	class FileReadException : std::exception {
+	class FileReadException : public std::exception {
 		// ...
 	};
 	//------------------------------
