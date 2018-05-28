@@ -26,6 +26,8 @@ public:
 
 	Field<fp_t> dynamic_field;
 
+	index_t dimension;
+
 	void readFromFile(const std::string &filename);
 
 	//------------------------------

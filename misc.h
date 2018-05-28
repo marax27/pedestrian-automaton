@@ -11,6 +11,9 @@ template<typename T>
 struct Vec2D{
 	T x = T(),
 	  y = T();
+	
+	Vec2D() = default;
+	Vec2D(T _x, T _y) : x(_x), y(_y) {}
 };
 
 //************************************************************
