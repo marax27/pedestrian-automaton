@@ -26,5 +26,5 @@ int main(){
 		 << shot.pedestrians.size() << " pedestrians.\n"
 		 << shot.walls.size() << " walls.\n";
 
-	shot.writeToFile("output_test.test");
+	shot.writeToFile("output_test.map");
 }

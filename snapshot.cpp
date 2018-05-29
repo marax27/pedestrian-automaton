@@ -112,12 +112,10 @@ void Snapshot::writeToFile(const std::string &filename) const {
 		auto pos = p.getPosition();
 		rows[pos.y][pos.x] = 'p';
 	}
-	for(const auto &w : walls){
+	for(const auto &w : walls)
 		rows[w.y][w.x] = 'W';
-	}
-	for(const auto &x : exits){
+	for(const auto &x : exits)
 		rows[x.y][x.x] = 'X';
-	}
 
 	writer << "dimension: " << dimension << '\n';
 	writer << "map:\n";
