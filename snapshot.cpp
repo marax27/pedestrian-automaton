@@ -86,6 +86,12 @@ void Snapshot::readFromFile(const std::string &filename){
 			}
 		}
 	}
+
+	this->dynamic_field = Field<fp_t>(this->dimension);
+	for(index_t i = 0; i != dimension; ++i)
+		for(index_t j = 0; j != dimension; ++j)
+			dynamic_field(j, i) = 0.0f;
+
 }
 
 
