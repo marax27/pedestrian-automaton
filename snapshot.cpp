@@ -94,6 +94,36 @@ void Snapshot::readFromFile(const std::string &filename){
 
 }
 
+//************************************************************
+
+void Snapshot::writeToFile(const std::string &filename) const {
+	std::ofstream writer(filename);  //no ios::binary
+	if(!writer){
+		Output::printError("Failed to save a snapshot to '{}'.", filename);
+		throw FileWriteException();
+	}
+
+	// Prepare text-mode map.
+	std::vector<std::string> rows;
+	rows.resize(dimension);
+	for(auto &r : rows)
+		r.resize(dimension, '.');
+	for(const auto &p : pedestrians){
+		auto pos = p.getPosition();
+		rows[pos.y][pos.x] = 'p';
+	}
+	for(const auto &w : walls){
+		rows[w.y][w.x] = 'W';
+	}
+	for(const auto &x : exits){
+		rows[x.y][x.x] = 'X';
+	}
+
+	writer << "dimension: " << dimension << '\n';
+	writer << "map:\n";
+	for(const auto &r : rows)
+		writer << r << '\n';
+}
 
 
 }

@@ -29,11 +29,13 @@ public:
 	index_t dimension;
 
 	void readFromFile(const std::string &filename);
+	
+	void writeToFile(const std::string &filename) const;
 
 	//------------------------------
-	class FileReadException : public std::exception {
-		// ...
-	};
+	class FileReadException : public std::exception {};
+
+	class FileWriteException : public std::exception {};
 	//------------------------------
 
 private:

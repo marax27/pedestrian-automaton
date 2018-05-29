@@ -26,6 +26,5 @@ int main(){
 		 << shot.pedestrians.size() << " pedestrians.\n"
 		 << shot.walls.size() << " walls.\n";
 
-	// for(const auto &i : shot.walls)
-		// cout << '{' << i.x << ", " << i.y << "}\n";
+	shot.writeToFile("output_test.test");
 }
