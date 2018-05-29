@@ -1,7 +1,6 @@
 #include "matrix.h"
 #include "field.h"
 
-#include "bmp.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -26,7 +25,7 @@ int main(){
 	     << shot.exits.size() << " exits.\n"
 		 << shot.pedestrians.size() << " pedestrians.\n"
 		 << shot.walls.size() << " walls.\n";
-	
+
 	// for(const auto &i : shot.walls)
 		// cout << '{' << i.x << ", " << i.y << "}\n";
 }
