@@ -11,5 +11,8 @@ main.o: main.cpp matrix.h misc.h output.h pedestrian.h field.h
 snapshot.o: snapshot.cpp snapshot.h pedestrian.h field.h
 	$(CPP) $(FLAGS) snapshot.cpp -c -o snapshot.o
 
+simulation.o: simulation.cpp snapshot.h
+	$(CPP) $(FLAGS) snapshot.cpp -c -o snapshot.o
+
 clean:
 	rm -f *.o $(PROJ_NAME) a.out

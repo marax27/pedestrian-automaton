@@ -9,10 +9,15 @@ namespace sim{
 class Simulation{
 public:
 	Simulation() = delete;  //initial conditions required
-	Simulation(const Snapshot &snapshot) : data(snapshot) {}
-	Simulation(Snapshot &&snapshot) : data(snapshot) {}
+	Simulation(const Snapshot &snapshot) : data(snapshot), time_elapsed(0) {}
+	Simulation(Snapshot &&snapshot) : data(snapshot), time_elapsed(0) {}
 
 	~Simulation() {}
+
+	Simulation& operator=(const Simulation &s) = delete;
+
+	// Simulation progress - 1 step per function call.
+	void runStep();
 
 	// An interface for simulation's data access.
 	//------------------------------
@@ -39,6 +44,10 @@ public:
 		index_t getDimension() const {
 			return target.data.dimension;
 		}
+
+		index_t getTime() const {
+			return target.time_elapsed;
+		}
 		
 	private:
 		Simulation &target;
@@ -47,6 +56,7 @@ public:
 
 private:
 	Snapshot data;
+	index_t time_elapsed;
 
 	friend class Viewer;
 };
