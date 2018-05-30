@@ -9,8 +9,12 @@ namespace sim{
 class Simulation{
 public:
 	Simulation() = delete;  //initial conditions required
-	Simulation(const Snapshot &snapshot) : data(snapshot), time_elapsed(0) {}
-	Simulation(Snapshot &&snapshot) : data(snapshot), time_elapsed(0) {}
+	Simulation(const Snapshot &snapshot) : data(snapshot), time_elapsed(0) {
+		initializeStaticField();
+	}
+	Simulation(Snapshot &&snapshot) : data(snapshot), time_elapsed(0) {
+		initializeStaticField();
+	}
 
 	~Simulation() {}
 
@@ -48,6 +52,10 @@ public:
 		index_t getTime() const {
 			return target.time_elapsed;
 		}
+
+		const Field<fp_t>& getStaticField() const {
+			return target.static_field;
+		}
 		
 	private:
 		Simulation &target;
@@ -57,6 +65,11 @@ public:
 private:
 	Snapshot data;
 	index_t time_elapsed;
+
+	// Calculated once during initialization of a Simulation.
+	Field<fp_t> static_field;
+
+	void initializeStaticField();
 
 	friend class Viewer;
 };
