@@ -35,8 +35,7 @@ void Simulation::initializeStaticField(){
 				if(d < min_dist)
 					min_dist = d;
 			}
-
-			static_field(y, x) = exp(-min_dist);
+			static_field(y, x) = exp(-0.2*min_dist);
 		}
 	}
 
