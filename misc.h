@@ -12,6 +12,10 @@ struct Vec2D{
 	T x = T(),
 	  y = T();
 	
+	bool operator==(const Vec2D &v) const {
+		return x == v.x && y == v.y;
+	}
+
 	Vec2D() = default;
 	Vec2D(T _x, T _y) : x(_x), y(_y) {}
 };

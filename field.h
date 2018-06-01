@@ -78,7 +78,7 @@ private:
 	index_t size;
 
 	// A dummy variable which is returned when out-of-range element is requested.
-	T dummy;
+	mutable T dummy;
 	T default_dummy_state;
 
 	inline void free(){
