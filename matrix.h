@@ -81,6 +81,18 @@ public:
 	constexpr size_type rows() const { return _Rows; }
 	constexpr size_type columns() const { return _Columns; }
 
+	// Convert type of all elements to U and return converted matrix.
+	template<typename U>
+	Matrix<U, _Rows, _Columns> as() const {
+		Matrix<U, _Rows, _Columns> result;
+		for(size_type i = 0; i != size(); ++i){
+			size_type x = i % _Columns,
+			          y = (i - x) / _Columns;
+			result(y, x) = static_cast<U>(data[i]);
+		}
+		return result;
+	}
+
 private:
 	T *data;
 

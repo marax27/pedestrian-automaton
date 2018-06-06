@@ -9,9 +9,11 @@
 // - state of dynamic floor field
 // - simulation constants.
 
+#include <map>
 #include <vector>
 #include <string>
 
+#include "uid.h"
 #include "field.h"
 #include "pedestrian.h"
 
@@ -19,7 +21,7 @@ namespace sim{
 
 class Snapshot{
 public:
-	std::vector<Pedestrian> pedestrians;
+	std::map<uid_t, Pedestrian> pedestrians;
 	
 	std::vector<vec2> walls;
 	std::vector<vec2> exits;

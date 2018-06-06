@@ -9,7 +9,8 @@ namespace sim{
 
 class Pedestrian{
 public:
-	Pedestrian(vec2 pos) : position(pos) {}
+	Pedestrian() = default;
+	explicit Pedestrian(vec2 pos) : position(pos) {}
 
 	vec2 getPosition() const {
 		return position;

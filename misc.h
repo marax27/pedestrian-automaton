@@ -32,6 +32,8 @@ namespace sim{
 	typedef float fp_t; 
 
 	typedef Vec2D<index_t> vec2;
+
+	typedef uint32_t uid_t;
 }
 
 //************************************************************

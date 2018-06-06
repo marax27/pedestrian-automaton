@@ -11,8 +11,8 @@ sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m){
 	for(sim::index_t i = 0; i != 9; ++i)
 		sum += m((i - i%3)/3, i%3);
 
-	sim::Output::printWarning("P:\n{} {} {}\n{} {} {}\n{} {} {}",
-		m(0,0),m(0,1),m(0,2),m(1,0),m(1,1),m(1,2),m(2,0),m(2,1),m(2,2));
+	// sim::Output::printWarning("P:\n{} {} {}\n{} {} {}\n{} {} {}",
+		// m(0,0),m(0,1),m(0,2),m(1,0),m(1,1),m(1,2),m(2,0),m(2,1),m(2,2));
 
 	sim::fp_t random = (double)rand() / RAND_MAX;  // 0 < random < 1
 	random *= sum;
@@ -33,31 +33,22 @@ void Simulation::runStep(){
 	// * Move each pedestrian.
 	// * Update dynamic field.
 
-	// Not Occuppied By a Pedestrian
-	auto NOBP = [&](vec2 pos){
-		return (fp_t)1.0 * !data.occupiedByPedestrian(pos);
-	};
+	// For each pedestrian:
+	// get S_ij, N_ij (is neighbourhood occupied)
+	// compute P_ij: matrix of probabilities
+	// pick random field of P_ij
+	// ++time_elapsed
 
-	const auto &sf = static_field;
-	for(auto &p : data.pedestrians){
-		index_t x = p.getPosition().x,
-		        y = p.getPosition().y;
-		Matrix<fp_t, 3, 3> S{
-			{0, sf.at(y-1, x), 0},
-			{sf.at(y, x-1), sf.at(y  , x), sf.at(y, x+1)},
-			{0, sf.at(y+1, x), 0}
-		};
-		Matrix<fp_t, 3, 3> N{
-			{0, NOBP({x, y-1}), 0},
-			{NOBP({x-1, y}), 1, NOBP({x+1, y})},
-			{0, NOBP({x, y+1}), 0}
-		};
-		Matrix<fp_t, 3, 3> P = S * N;
+	auto *new_queue = new PedestrianPriorityQueue<fp_t>(static_field, data.pedestrians);
 
-		auto r = randomMatrixElement(P);
-		Output::printWarning("r: ({}, {}). Cpos: ({}, {})", r.x, r.y, x, y);
-		p.move({x + r.x - 1, y + r.y - 1});
-		Output::printWarning("Pedestrian set to ({}, {})", x, y);
+	while(!pqueue->empty()){
+		uid_t id = pqueue->top();
+		vec2 pos = data.pedestrians.at(id).getPosition();
+		new_queue->push(id);
+
+		// Get values of static field in the neighbourhood of a pedestrian.
+		Matrix<fp_t, 3, 3> S = neighbourhoodStaticField(pos);  //std::move maybe?
+		pqueue->pop();
 	}
 
 	++time_elapsed;
@@ -97,6 +88,32 @@ void Simulation::initializeStaticField(){
 	for(const auto &w : data.walls)
 		static_field(w.y, w.x) = WALL;
 }
+
+//************************************************************
+
+Matrix<fp_t, 3, 3> Simulation::neighbourhoodStaticField(vec2 pos) const {
+	// TODO: So far, only von Neumann model is utilized.
+	index_t &x = pos.x,
+	        &y = pos.y;
+	return Matrix<fp_t,3,3>{
+		{                      0, static_field.at(y-1, x),                       0},
+		{static_field.at(y, x-1),   static_field.at(y, x), static_field.at(y, x+1)},
+		{                      0, static_field.at(y+1, x),                       0}
+	};
+}
+
+//************************************************************
+
+/*Matrix<bool, 3, 3> Simulation::neighbourhoodStaticField(vec2 pos) const {
+	// TODO: So far, only von Neumann model is utilized.
+	index_t &x = pos.x,
+	        &y = pos.y;
+	return Matrix<fp_t,3,3>{
+		{                   0, static_field(y-1, x),                    0},
+		{static_field(y, x-1),   static_field(y, x), static_field(y, x+1)},
+		{                   0, static_field(y+1, x),                    0}
+	};
+}*/
 
 //************************************************************
 

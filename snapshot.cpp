@@ -71,7 +71,7 @@ void Snapshot::readFromFile(const std::string &filename){
 			vec2 pos(c, r);
 			switch(tolower(map[r][c])){
 			case 'p':
-				this->pedestrians.push_back(Pedestrian(pos));
+				this->pedestrians[UidGenerator<uid_t>::getUid()] = Pedestrian(pos);
 				break;
 			case 'w':
 				this->walls.push_back(pos);
@@ -109,7 +109,7 @@ void Snapshot::writeToFile(const std::string &filename) const {
 	for(auto &r : rows)
 		r.resize(dimension, '.');
 	for(const auto &p : pedestrians){
-		auto pos = p.getPosition();
+		auto pos = p.second.getPosition();
 		rows[pos.y][pos.x] = 'p';
 	}
 	for(const auto &w : walls)
