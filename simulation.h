@@ -9,7 +9,8 @@ namespace sim{
 class Simulation{
 public:
 	Simulation() = delete;  //initial conditions required
-	Simulation(const Snapshot &snapshot) : data(snapshot), time_elapsed(0) {
+	Simulation(const Snapshot &snapshot)
+		: data(snapshot), time_elapsed(0) {
 		initializeStaticField();
 	}
 	Simulation(Snapshot &&snapshot) : data(snapshot), time_elapsed(0) {
