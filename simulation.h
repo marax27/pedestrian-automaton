@@ -1,6 +1,8 @@
 #ifndef _SIMULATION_H_
 #define _SIMULATION_H_
 
+#include <algorithm>
+
 #include "matrix.h"
 #include "snapshot.h"
 #include "pedestrian_priority_queue.h"
@@ -92,7 +94,6 @@ private:
 
 	Matrix<fp_t, 3, 3> neighbourhoodStaticField(vec2 pos) const;
 	Matrix<bool, 3, 3> neighbourhoodOccupiedFields(vec2 pos) const;
-
 
 	std::map<uid_t, Pedestrian>::const_iterator getPedestrianByPos(vec2 pos) const;	
 	bool occupiedByPedestrian(vec2 pos) const;
