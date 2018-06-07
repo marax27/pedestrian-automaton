@@ -1,29 +1,13 @@
-#include "simulation.h"
+#include <algorithm>
 #include <limits>
 #include <cmath>
 
 #include "matrix.h"
-#include <ctime>
+#include "simulation.h"
 
 // Return random element of a matrix. Treat values as weights.
-sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m){
-	sim::fp_t sum = 0.0, t = 0.0;
-	for(sim::index_t i = 0; i != 9; ++i)
-		sum += m((i - i%3)/3, i%3);
+sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m);
 
-	// sim::Output::printWarning("P:\n{} {} {}\n{} {} {}\n{} {} {}",
-		// m(0,0),m(0,1),m(0,2),m(1,0),m(1,1),m(1,2),m(2,0),m(2,1),m(2,2));
-
-	sim::fp_t random = (double)rand() / RAND_MAX;  // 0 < random < 1
-	random *= sum;
-
-	for(sim::index_t i = 0; i != 9; ++i){
-		t += m((i - i%3)/3, i%3);
-		if(random <= t)
-			return sim::vec2(i%3, (i - i%3)/3);
-	}
-	return sim::vec2(2, 2);
-}
 
 namespace sim{
 
@@ -44,12 +28,48 @@ void Simulation::runStep(){
 	while(!pqueue->empty()){
 		uid_t id = pqueue->top();
 		vec2 pos = data.pedestrians.at(id).getPosition();
-		new_queue->push(id);
 
 		// Get values of static field in the neighbourhood of a pedestrian.
 		Matrix<fp_t, 3, 3> S = neighbourhoodStaticField(pos);  //std::move maybe?
+
+		// Get occupation matrix.
+		Matrix<bool, 3, 3> N = neighbourhoodOccupiedFields(pos);
+
+		// TODO: dynamic field.
+
+		/*std::cerr << '(' << pos.x << ", " << pos.y << ")\n";
+		for(int y=0; y!=3; ++y){
+			for(int x=0; x!=3; ++x)
+				std::cerr << N(y, x) << ' ';
+			std::cerr << "   ";
+			for(int x=0; x!=3; ++x)
+				std::cerr << S(y,x) << ' ';
+			std::cerr << '\n';
+		}
+		std::cerr << '\n';*/
+
+		// Probability matrix.
+		Matrix<fp_t, 3, 3> P = S * N.as<fp_t>();
+
+		vec2 new_pos = randomMatrixElement(P);
+		// Coords of new_pos contains values from {0, 1, 2},
+		// which represent pedestrian's offset:  {-1, 0, 1}.
+		// Since index_t is unsigned, one should avoid diving below 0.
+		pos = {pos.x + new_pos.x - 1, pos.y + new_pos.y - 1};
+		data.pedestrians.at(id).setPosition(pos);
+
 		pqueue->pop();
+		if(isExit(pos)){
+			// Remove pedestrian from data.pedestrians and do not add
+			// push him/her into the queue.
+			data.pedestrians.erase(getPedestrianByPos(pos));
+		}
+		else
+			new_queue->push(id);
 	}
+
+	delete pqueue;
+	pqueue = new_queue;
 
 	++time_elapsed;
 }
@@ -96,25 +116,66 @@ Matrix<fp_t, 3, 3> Simulation::neighbourhoodStaticField(vec2 pos) const {
 	index_t &x = pos.x,
 	        &y = pos.y;
 	return Matrix<fp_t,3,3>{
-		{                      0, static_field.at(y-1, x),                       0},
-		{static_field.at(y, x-1),   static_field.at(y, x), static_field.at(y, x+1)},
-		{                      0, static_field.at(y+1, x),                       0}
+		{                      0, static_field.at(x, y-1),                       0},
+		{static_field.at(x-1, y),   static_field.at(x, y), static_field.at(x+1, y)},
+		{                      0, static_field.at(x, y+1),                       0}
 	};
 }
 
 //************************************************************
 
-/*Matrix<bool, 3, 3> Simulation::neighbourhoodStaticField(vec2 pos) const {
+Matrix<bool, 3, 3> Simulation::neighbourhoodOccupiedFields(vec2 pos) const {
 	// TODO: So far, only von Neumann model is utilized.
 	index_t &x = pos.x,
 	        &y = pos.y;
-	return Matrix<fp_t,3,3>{
-		{                   0, static_field(y-1, x),                    0},
-		{static_field(y, x-1),   static_field(y, x), static_field(y, x+1)},
-		{                   0, static_field(y+1, x),                    0}
+	return Matrix<bool,3,3>{
+		{                              0, !occupiedByPedestrian({x, y-1}), 0},
+		{!occupiedByPedestrian({x-1, y}),                               1, !occupiedByPedestrian({x+1, y})},
+		{                              0, !occupiedByPedestrian({x, y+1}), 0}
 	};
-}*/
+}
+
+//************************************************************
+
+std::map<uid_t, Pedestrian>::const_iterator
+	Simulation::getPedestrianByPos(vec2 pos) const {
+	
+	const auto it = std::find_if(
+		data.pedestrians.begin(), data.pedestrians.end(),
+		[&pos](const std::pair<uid_t,Pedestrian> &p){
+			return p.second.getPosition() == pos;
+		}
+	);
+	return it;
+}
+
+//************************************************************
+
+bool Simulation::occupiedByPedestrian(vec2 pos) const {
+	return getPedestrianByPos(pos) != data.pedestrians.end();
+}
 
 //************************************************************
 
 }
+
+//************************************************************
+
+sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m){
+	sim::fp_t sum = 0.0, t = 0.0;
+	for(sim::index_t i = 0; i != 9; ++i)
+		sum += m((i - i%3)/3, i%3);
+
+	sim::fp_t random = (double)rand() / RAND_MAX;  // 0 < random < 1
+	random *= sum;
+
+	for(sim::index_t i = 0; i != 9; ++i){
+		t += m((i - i%3)/3, i%3);
+		if(random <= t)
+			return sim::vec2(i%3, (i - i%3)/3);
+	}
+	// Perhaps throw something?
+	return sim::vec2(2, 2);
+}
+
+//************************************************************
