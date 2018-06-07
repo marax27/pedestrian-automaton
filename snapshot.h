@@ -16,6 +16,7 @@
 #include "uid.h"
 #include "field.h"
 #include "pedestrian.h"
+#include "file_format.h"
 
 namespace sim{
 
@@ -30,18 +31,11 @@ public:
 
 	index_t dimension;
 
-	void readFromFile(const std::string &filename);
+	virtual void readFromFile(const std::string &filename);
 	
-	void writeToFile(const std::string &filename) const;
-
-	//------------------------------
-	class FileReadException : public std::exception {};
-
-	class FileWriteException : public std::exception {};
-	//------------------------------
+	virtual void writeToFile(const std::string &filename) const;
 
 private:
-	
 };
 
 }
