@@ -91,6 +91,16 @@ private:
 	void initializeStaticField();
 
 	Matrix<fp_t, 3, 3> neighbourhoodStaticField(vec2 pos) const;
+	Matrix<bool, 3, 3> neighbourhoodOccupiedFields(vec2 pos) const;
+
+
+	std::map<uid_t, Pedestrian>::const_iterator getPedestrianByPos(vec2 pos) const;	
+	bool occupiedByPedestrian(vec2 pos) const;
+
+	inline bool isExit(vec2 pos) const {
+		return std::find(data.exits.begin(), data.exits.end(), pos)
+				!= data.exits.end();
+	}
 
 	friend class Viewer;
 };
