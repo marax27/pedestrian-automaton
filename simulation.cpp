@@ -69,9 +69,8 @@ void Simulation::runStep(){
 //************************************************************
 
 void Simulation::initializeStaticField(){
-	// First approach.
 	// Exits: 1.0
-	// Free space: 1/e^(distance from nearest exit)
+	// Free space: A*e^(-ax) + min
 	// Walls: 0.0
 
 	const fp_t EXIT = config.max,
