@@ -16,6 +16,10 @@ struct Vec2D{
 		return x == v.x && y == v.y;
 	}
 
+	bool operator!=(const Vec2D &v) const {
+		return !(*this == v);
+	}
+
 	Vec2D() = default;
 	Vec2D(T _x, T _y) : x(_x), y(_y) {}
 };

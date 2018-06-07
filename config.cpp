@@ -56,6 +56,10 @@ void Config::readFromFile(const std::string &filename){
 					throw FileFormat::FileReadException();
 				}
 			}
+			else if(token == "dynamic_usable_decay")
+				tokenizer >> dynamic_usable_decay;
+			else if(token == "dynamic_usable_max")
+				tokenizer >> dynamic_usable_max;
 			else if(token == "dynamic_step")
 				tokenizer >> dynamic_step;
 			else if(token == "dynamic_decay")

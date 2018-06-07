@@ -27,7 +27,8 @@ void Simulation::runStep(){
 		// Get occupation matrix.
 		Matrix<bool, 3, 3> N = neighbourhoodOccupiedFields(pos);
 
-		// TODO: dynamic field.
+		// Get dynamic field.
+		Matrix<fp_t, 3, 3> D = neighbourhoodDynamicField(pos);
 
 		/*std::cerr << '(' << pos.x << ", " << pos.y << ")\n";
 		for(int y=0; y!=3; ++y){
@@ -41,7 +42,7 @@ void Simulation::runStep(){
 		std::cerr << '\n';*/
 
 		// Probability matrix.
-		Matrix<fp_t, 3, 3> P = S * N.as<fp_t>();
+		Matrix<fp_t, 3, 3> P = S * N.as<fp_t>() * D;
 
 		vec2 new_pos = randomMatrixElement(P);
 		// Coords of new_pos contains values from {0, 1, 2},
@@ -49,6 +50,13 @@ void Simulation::runStep(){
 		// Since index_t is unsigned, one should avoid diving below 0.
 		pos = {pos.x + new_pos.x - 1, pos.y + new_pos.y - 1};
 		data.pedestrians.at(id).setPosition(pos);
+
+		// Increment dynamic field of a cell now occupied by a pedestrian,
+		// unless pedestrian didn't move at all.
+		if(new_pos != vec2{1, 1}){
+			auto &cell = data.dynamic_field.at(pos.x, pos.y);
+			cell += config.dynamic_step;
+		}
 
 		pqueue->pop();
 		if(isExit(pos)){
@@ -58,6 +66,21 @@ void Simulation::runStep(){
 		}
 		else
 			new_queue->push(id);
+	}
+
+	// Perform diffusion and decay of dynamic field.
+	for(index_t y = 0; y != data.dynamic_field.dimension(); ++y){
+		for(index_t x = 0; x != data.dynamic_field.dimension(); ++x){
+			fp_t delta = config.dynamic_decay * data.dynamic_field(x, y);
+
+			// Decay.
+			data.dynamic_field(x, y) -= delta;
+
+			// Diffusion.
+			int rnd = rand() % 9;  // Picking random neighbour.
+			                       // Picking itself is also possible.
+			data.dynamic_field.at(x + rnd%3 - 1, y + (rnd - rnd%3)/3 - 1) += delta;
+		}
 	}
 
 	delete pqueue;
@@ -127,6 +150,30 @@ Matrix<fp_t, 3, 3> Simulation::neighbourhoodStaticField(vec2 pos) const {
 
 //************************************************************
 
+Matrix<fp_t, 3, 3> Simulation::neighbourhoodDynamicField(vec2 pos) const {
+	index_t &x = pos.x,
+	        &y = pos.y;
+
+	switch(config.neighbourhood){
+		case Config::VON_NEUMANN:
+		return Matrix<fp_t,3,3>{
+		 {                     0, dynamicValue({x, y-1}), 0},
+		 {dynamicValue({x-1, y}),   dynamicValue({x, y}), dynamicValue({x+1, y})},
+		 {                     0, dynamicValue({x, y+1}), 0}
+		};
+		case Config::MOORE:
+		return  Matrix<fp_t,3,3>{
+		 {dynamicValue({x-1, y-1}), dynamicValue({x, y-1}), dynamicValue({x+1, y-1})},
+		 {  dynamicValue({x-1, y}), dynamicValue({x, y}),   dynamicValue({x+1, y})},
+		 {dynamicValue({x-1, y+1}), dynamicValue({x, y+1}), dynamicValue({x+1, y+1})}
+		};
+		default:
+			throw SimulationException();
+	}
+}
+
+//************************************************************
+
 Matrix<bool, 3, 3> Simulation::neighbourhoodOccupiedFields(vec2 pos) const {
 	// TODO: So far, only von Neumann model is utilized.
 	index_t &x = pos.x,
@@ -168,6 +215,16 @@ std::map<uid_t, Pedestrian>::const_iterator
 
 bool Simulation::occupiedByPedestrian(vec2 pos) const {
 	return getPedestrianByPos(pos) != data.pedestrians.end();
+}
+
+//************************************************************
+
+fp_t Simulation::dynamicValue(vec2 pos) const {
+	if(pos.x >= data.dynamic_field.dimension() || pos.y >= data.dynamic_field.dimension())
+		return 0.0;
+	return config.dynamic_usable_max * (
+		1 - exp(-config.dynamic_usable_decay * data.dynamic_field(pos.x, pos.y))
+	);
 }
 
 //************************************************************

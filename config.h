@@ -22,6 +22,9 @@ public:
 	
 	e_NeighbourhoodType neighbourhood;
 
+	fp_t dynamic_usable_decay = 0.25,
+	     dynamic_usable_max = 1.0;
+	
 	fp_t dynamic_step = 1.0,
 	     dynamic_decay = 0.1,
 	     diffusion = 0.9;

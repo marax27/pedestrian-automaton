@@ -97,6 +97,7 @@ private:
 	void initializeStaticField();
 
 	Matrix<fp_t, 3, 3> neighbourhoodStaticField(vec2 pos) const;
+	Matrix<fp_t, 3, 3> neighbourhoodDynamicField(vec2 pos) const;
 	Matrix<bool, 3, 3> neighbourhoodOccupiedFields(vec2 pos) const;
 
 	std::map<uid_t, Pedestrian>::const_iterator getPedestrianByPos(vec2 pos) const;	
@@ -106,6 +107,12 @@ private:
 		return std::find(data.exits.begin(), data.exits.end(), pos)
 				!= data.exits.end();
 	}
+
+	// Get usable value of dynamic field at given position.
+	// Note: usable value != raw dynamic field value
+	// 0 <= Dij < +inf
+	// 0 <= dynamicValue < x
+	fp_t dynamicValue(vec2 pos) const;
 
 	friend class Viewer;
 };
