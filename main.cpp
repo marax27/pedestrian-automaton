@@ -51,14 +51,19 @@ int main(){
 	sim::Simulation::Viewer viewer(simul);
 
 	const index_t D = viewer.getDimension();
-	/*JiMP2::BMP b(D, D);
+
+	// Static field printout.
+	/*JiMP2::BMP sf(D, D);
 	for(index_t y=0; y!=D; ++y){
 		for(index_t x=0; x!=D; ++x){
 			fp_t s = viewer.getStaticField()(y, x);
 			uint8_t g = uint8_t(s*255.0);
-			b.setPixel(x, y+1, g, g, g);
+			sf.setPixel(x, y+1, g, g, g);
 		}
-	}*/
+	}
+	std::ofstream sfw("dump/static.bmp");
+	sfw << sf;
+	sfw.close();*/
 
 	for(int i=0; i!=100; ++i){
 		JiMP2::BMP b(D*15, D*15);
@@ -70,7 +75,6 @@ int main(){
 		
 		for(const auto &p : viewer.getPedestrians())
 			drawSquare(b, {p.second.getPosition().x, p.second.getPosition().y});
-			// b.setPixel(p.getPosition().x, p.getPosition().y+1, 0, 0, 0);
 
 		writer << b;
 		writer.close();

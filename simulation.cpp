@@ -8,20 +8,12 @@
 // Return random element of a matrix. Treat values as weights.
 sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m);
 
-
 namespace sim{
 
 //************************************************************
 
 void Simulation::runStep(){
-	// * Move each pedestrian.
-	// * Update dynamic field.
-
-	// For each pedestrian:
-	// get S_ij, N_ij (is neighbourhood occupied)
-	// compute P_ij: matrix of probabilities
-	// pick random field of P_ij
-	// ++time_elapsed
+	// TODO: Utilize and update dynamic field.
 
 	auto *new_queue = new PedestrianPriorityQueue<fp_t>(static_field, data.pedestrians);
 
@@ -82,7 +74,7 @@ void Simulation::initializeStaticField(){
 	// Free space: 1/e^(distance from nearest exit)
 	// Walls: 0.0
 
-	const fp_t EXIT = 1.0f,
+	const fp_t EXIT = config.max,
 	           WALL = 0.0f,
 			   INF = std::numeric_limits<fp_t>::infinity();
 
@@ -98,7 +90,8 @@ void Simulation::initializeStaticField(){
 				if(d < min_dist)
 					min_dist = d;
 			}
-			static_field(y, x) = exp(-0.2*min_dist);
+			auto A = config.max - config.min;
+			static_field(y, x) = A * exp(-config.decay*min_dist) + config.min;
 		}
 	}
 
@@ -112,14 +105,25 @@ void Simulation::initializeStaticField(){
 //************************************************************
 
 Matrix<fp_t, 3, 3> Simulation::neighbourhoodStaticField(vec2 pos) const {
-	// TODO: So far, only von Neumann model is utilized.
 	index_t &x = pos.x,
 	        &y = pos.y;
-	return Matrix<fp_t,3,3>{
-		{                      0, static_field.at(x, y-1),                       0},
-		{static_field.at(x-1, y),   static_field.at(x, y), static_field.at(x+1, y)},
-		{                      0, static_field.at(x, y+1),                       0}
-	};
+
+	switch(config.neighbourhood){
+		case Config::VON_NEUMANN:
+		return Matrix<fp_t,3,3>{
+		 {                      0, static_field.at(x, y-1),                       0},
+		 {static_field.at(x-1, y),   static_field.at(x, y), static_field.at(x+1, y)},
+		 {                      0, static_field.at(x, y+1),                       0}
+		};
+		case Config::MOORE:
+		return  Matrix<fp_t,3,3>{
+		 {static_field.at(x-1, y-1), static_field.at(x, y-1), static_field.at(x+1, y-1)},
+		 {  static_field.at(x-1, y),   static_field.at(x, y), static_field.at(x+1, y)},
+		 {static_field.at(x-1, y+1), static_field.at(x, y+1), static_field.at(x+11, y+1)}
+		};
+		default:
+			throw SimulationException();
+	}
 }
 
 //************************************************************
@@ -128,11 +132,23 @@ Matrix<bool, 3, 3> Simulation::neighbourhoodOccupiedFields(vec2 pos) const {
 	// TODO: So far, only von Neumann model is utilized.
 	index_t &x = pos.x,
 	        &y = pos.y;
-	return Matrix<bool,3,3>{
-		{                              0, !occupiedByPedestrian({x, y-1}), 0},
-		{!occupiedByPedestrian({x-1, y}),                               1, !occupiedByPedestrian({x+1, y})},
-		{                              0, !occupiedByPedestrian({x, y+1}), 0}
-	};
+
+	switch(config.neighbourhood){
+		case Config::VON_NEUMANN:
+		return Matrix<bool,3,3>{
+		 {                              0, !occupiedByPedestrian({x, y-1}), 0},
+		 {!occupiedByPedestrian({x-1, y}),                               1, !occupiedByPedestrian({x+1, y})},
+		 {                              0, !occupiedByPedestrian({x, y+1}), 0}
+		};
+		case Config::MOORE:
+		return Matrix<bool,3,3>{
+		 {!occupiedByPedestrian({x-1,y-1}), !occupiedByPedestrian({x,y-1}), !occupiedByPedestrian({x+1,y-1}),},
+		 {!occupiedByPedestrian({x-1,y}),                                1, !occupiedByPedestrian({x+1, y})},
+		 {!occupiedByPedestrian({x-1,y+1}), !occupiedByPedestrian({x,y+1}), !occupiedByPedestrian({x+1,y+1}),}
+		};
+		default:
+			throw SimulationException();
+	}
 }
 
 //************************************************************

@@ -68,6 +68,8 @@ public:
 		Simulation &target;
 	};
 	//------------------------------
+	class SimulationException : public std::exception {};
+	//------------------------------
 
 private:
 	Snapshot data;
