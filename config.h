@@ -14,11 +14,17 @@ public:
 		VON_NEUMANN, MOORE
 	};
 
-	fp_t decay = 0.25,
+	// Constants.
+
+	fp_t static_decay = 0.25,
 	     max = 1.0,
 	     min = 0.0;
 	
 	e_NeighbourhoodType neighbourhood;
+
+	fp_t dynamic_step = 1.0,
+	     dynamic_decay = 0.1,
+	     diffusion = 0.9;
 
 	virtual void readFromFile(const std::string &filename);
 	

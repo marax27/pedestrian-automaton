@@ -39,8 +39,8 @@ void Config::readFromFile(const std::string &filename){
 			token.pop_back();  // remove ':'
 			std::string current_variable = token;
 
-			if(token == "decay")
-				tokenizer >> decay;
+			if(token == "static_decay")
+				tokenizer >> static_decay;
 			else if(token == "max")
 				tokenizer >> max;
 			else if(token == "min")
@@ -55,6 +55,16 @@ void Config::readFromFile(const std::string &filename){
 					Output::printError(err1 + "Invalid neighbourhood type: '{}'.", token);
 					throw FileFormat::FileReadException();
 				}
+			}
+			else if(token == "dynamic_step")
+				tokenizer >> dynamic_step;
+			else if(token == "dynamic_decay")
+				tokenizer >> dynamic_decay;
+			else if(token == "diffusion")
+				tokenizer >> diffusion;
+			else{
+				Output::printError(err1 + "Unknown token: '{}'.", token);
+				throw FileFormat::FileReadException();
 			}
 
 			if(!tokenizer){
@@ -76,11 +86,15 @@ void Config::writeToFile(const std::string &filename) const {
 		throw FileFormat::FileWriteException();
 	}
 
-	writer << "decay: " << decay << '\n'
+	writer << "static_decay: " << static_decay << '\n'
 	       << "max: " << max << '\n'
 	       << "min: " << min << "\n\n"
 
-		   << "neighbourhood: " << (neighbourhood == MOORE ? "moore" : "von_neumann") << '\n';
+	       << "neighbourhood: " << (neighbourhood == MOORE ? "moore" : "von_neumann") << "\n\n"
+
+	       << "dynamic_step: " << dynamic_step << '\n'
+	       << "dynamic_decay: " << dynamic_decay << '\n'
+	       << "diffusion: " << diffusion << "\n\n";
 
 	writer.close();
 }

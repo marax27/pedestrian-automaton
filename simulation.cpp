@@ -90,7 +90,7 @@ void Simulation::initializeStaticField(){
 					min_dist = d;
 			}
 			auto A = config.max - config.min;
-			static_field(x, y) = A * exp(-config.decay*min_dist) + config.min;
+			static_field(x, y) = A * exp(-config.static_decay*min_dist) + config.min;
 		}
 	}
 
