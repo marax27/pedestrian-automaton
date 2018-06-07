@@ -20,6 +20,9 @@ public:
 	
 	e_NeighbourhoodType neighbourhood;
 
+	virtual void readFromFile(const std::string &filename);
+	
+	virtual void writeToFile(const std::string &filename) const;
 };
 
 }

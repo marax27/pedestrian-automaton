@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "matrix.h"
+#include "config.h"
 #include "snapshot.h"
 #include "pedestrian_priority_queue.h"
 
@@ -13,12 +14,12 @@ namespace sim{
 class Simulation{
 public:
 	Simulation() = delete;  //initial conditions required
-	Simulation(const Snapshot &snapshot)
-		: data(snapshot), time_elapsed(0) {
+	Simulation(const Snapshot &snapshot, const Config &configuration)
+		: data(snapshot), config(configuration), time_elapsed(0) {
 		initializeSimulation();
 	}
-	Simulation(Snapshot &&snapshot)
-		: data(snapshot), time_elapsed(0) {
+	Simulation(Snapshot &&snapshot, const Config &configuration)
+		: data(snapshot), config(configuration), time_elapsed(0) {
 		initializeSimulation();
 	}
 
@@ -70,6 +71,7 @@ public:
 
 private:
 	Snapshot data;
+	Config config;
 	index_t time_elapsed;
 
 	// Calculated once during initialization of a Simulation.

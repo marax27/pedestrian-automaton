@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdlib>
 
+#include "config.h"
 #include "snapshot.h"
 #include "simulation.h"
 
@@ -37,7 +38,10 @@ int main(){
 	sim::Snapshot shot;
 	shot.readFromFile("inputs/rooms.map");
 
-	sim::Simulation simul(std::move(shot));
+	sim::Config conf;
+	conf.readFromFile("inputs/standard_settings.conf");
+
+	sim::Simulation simul(std::move(shot), conf);
 
 	cout << "Size: " << shot.dimension << 'x' << shot.dimension << '\n'
 	     << shot.exits.size() << " exits.\n"

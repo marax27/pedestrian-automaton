@@ -11,6 +11,10 @@ void Snapshot::readFromFile(const std::string &filename){
 		throw FileFormat::FileReadException();
 	}
 
+	std::stringstream err_fname_ss;
+	err_fname_ss << "Failed to process file '" << filename << "': ";
+	std::string err1 = err_fname_ss.str();
+
 	index_t dim = 0;
 	std::vector<std::string> map;
 
@@ -38,24 +42,24 @@ void Snapshot::readFromFile(const std::string &filename){
 			if(token == "dimension:"){
 				tokenizer >> dim;
 				if(!tokenizer){
-					Output::printError("Failed to process file '{}': could not have read map dimension.", filename);
+					Output::printError(err1 + "Could not have read map dimension.");
 					throw FileFormat::FileReadException();
 				}
 			}
 			else if(token == "map:"){
 				if(!dim){
-					Output::printError("Failed to process file '{}': Dimension is 0 or not provided.", filename);
+					Output::printError(err1 + "Dimension is 0 or not provided.");
 					throw FileFormat::FileReadException();
 				}
 				// Read a number of tokens - each one represents a row of a map.
 				for(index_t i = 0; i != dim; ++i){
 					reader >> token;
 					if(reader.fail()){
-						Output::printError("Failed to process file '{}': Failed to read {}. row of a map ({} expected).", filename, i+1, dim);
+						Output::printError(err1 + "Failed to read {}. row of a map ({} expected).", i+1, dim);
 						throw FileFormat::FileReadException();
 					}
 					if(token.size() != dim){
-						Output::printError("Failed to process file '{}': Row {} is of invalid length ({} expected).", filename, i+1, dim);
+						Output::printError(err1 + "Row {} is of invalid length ({} expected).", i+1, dim);
 						throw FileFormat::FileReadException();
 					}
 					map.push_back(token);
@@ -82,7 +86,7 @@ void Snapshot::readFromFile(const std::string &filename){
 			case '.':
 				break;
 			default:
-				Output::printError("Failed to process file '{}': Unknown character: '{}'", filename, map[r][c]);
+				Output::printError(err1 + "Unknown character: '{}'", filename, map[r][c]);
 			}
 		}
 	}
