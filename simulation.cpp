@@ -32,10 +32,10 @@ void Simulation::runStep(){
 		/*std::cerr << '(' << pos.x << ", " << pos.y << ")\n";
 		for(int y=0; y!=3; ++y){
 			for(int x=0; x!=3; ++x)
-				std::cerr << N(y, x) << ' ';
+				std::cerr << N(x,y) << ' ';
 			std::cerr << "   ";
 			for(int x=0; x!=3; ++x)
-				std::cerr << S(y,x) << ' ';
+				std::cerr << S(x,y) << ' ';
 			std::cerr << '\n';
 		}
 		std::cerr << '\n';*/
@@ -90,15 +90,15 @@ void Simulation::initializeStaticField(){
 					min_dist = d;
 			}
 			auto A = config.max - config.min;
-			static_field(y, x) = A * exp(-config.decay*min_dist) + config.min;
+			static_field(x, y) = A * exp(-config.decay*min_dist) + config.min;
 		}
 	}
 
 	// Assign appropriate special values to walls and exits.
 	for(const auto &ex : data.exits)
-		static_field(ex.y, ex.x) = EXIT;
+		static_field(ex.x, ex.y) = EXIT;
 	for(const auto &w : data.walls)
-		static_field(w.y, w.x) = WALL;
+		static_field(w.x, w.y) = WALL;
 }
 
 //************************************************************
@@ -179,13 +179,13 @@ bool Simulation::occupiedByPedestrian(vec2 pos) const {
 sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m){
 	sim::fp_t sum = 0.0, t = 0.0;
 	for(sim::index_t i = 0; i != 9; ++i)
-		sum += m((i - i%3)/3, i%3);
+		sum += m(i%3, (i - i%3)/3);
 
 	sim::fp_t random = (double)rand() / RAND_MAX;  // 0 < random < 1
 	random *= sum;
 
 	for(sim::index_t i = 0; i != 9; ++i){
-		t += m((i - i%3)/3, i%3);
+		t += m(i%3, (i - i%3)/3);
 		if(random <= t)
 			return sim::vec2(i%3, (i - i%3)/3);
 	}

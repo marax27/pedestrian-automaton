@@ -55,23 +55,23 @@ public:
 
 	// Data access.
 
-	inline T& at(size_type row, size_type column){
+	inline T& at(size_type column, size_type row){
 		if(row >= _Rows || column >= _Columns)
 			throw std::out_of_range("Matrix::at: demanded element out of range.");
-		return operator()(row, column);
+		return operator()(column, row);
 	}
 
-	inline const T& at(size_type row, size_type column) const{
+	inline const T& at(size_type column, size_type row) const{
 		if(row >= _Rows || column >= _Columns)
 			throw std::out_of_range("Matrix::at: demanded element out of range.");
-		return operator()(row, column);
+		return operator()(column, row);
 	}
 
-	inline T& operator()(size_type row, size_type column){
+	inline T& operator()(size_type column, size_type row){
 		return data[row*_Columns + column];
 	}
 
-	inline const T& operator()(size_type row, size_type column) const{
+	inline const T& operator()(size_type column, size_type row) const{
 		return data[row*_Columns + column];
 	}
 
@@ -88,7 +88,7 @@ public:
 		for(size_type i = 0; i != size(); ++i){
 			size_type x = i % _Columns,
 			          y = (i - x) / _Columns;
-			result(y, x) = static_cast<U>(data[i]);
+			result(x, y) = static_cast<U>(data[i]);
 		}
 		return result;
 	}

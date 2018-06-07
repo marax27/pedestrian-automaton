@@ -56,7 +56,7 @@ int main(){
 	/*JiMP2::BMP sf(D, D);
 	for(index_t y=0; y!=D; ++y){
 		for(index_t x=0; x!=D; ++x){
-			fp_t s = viewer.getStaticField()(y, x);
+			fp_t s = viewer.getStaticField()(x, y);
 			uint8_t g = uint8_t(s*255.0);
 			sf.setPixel(x, y+1, g, g, g);
 		}

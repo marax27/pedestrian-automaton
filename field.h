@@ -38,29 +38,29 @@ public:
 
 	// Data access.
 
-	inline T& at(size_type row, size_type column){
+	inline T& at(size_type column, size_type row){
 		if(row >= size || column >= size){
 			// throw std::out_of_range("Field::at: demanded element out of range.");
 			dummy = default_dummy_state;
 			return dummy;
 		}
-		return operator()(row, column);
+		return operator()(column, row);
 	}
 
-	inline const T& at(size_type row, size_type column) const{
+	inline const T& at(size_type column, size_type row) const{
 		if(row >= size || column >= size){
 			// throw std::out_of_range("Field::at: demanded element out of range.");
 			dummy = default_dummy_state;
 			return dummy;
 		}
-		return operator()(row, column);
+		return operator()(column, row);
 	}
 
-	inline T& operator()(size_type row, size_type column){
+	inline T& operator()(size_type column, size_type row){
 		return data[row*size + column];
 	}
 
-	inline const T& operator()(size_type row, size_type column) const{
+	inline const T& operator()(size_type column, size_type row) const{
 		return data[row*size + column];
 	}
 

@@ -24,7 +24,7 @@ public:
 
 	inline void push(uid_t id){
 		auto pos = pedestrians.at(id).getPosition();
-		pqueue.push(Node{id, key_provider.at(pos.y, pos.x)});
+		pqueue.push(Node{id, key_provider.at(pos.x, pos.y)});
 	}
 
 	inline uid_t top(){
