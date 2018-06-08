@@ -96,6 +96,9 @@ void Config::writeToFile(const std::string &filename) const {
 
 	       << "neighbourhood: " << (neighbourhood == MOORE ? "moore" : "von_neumann") << "\n\n"
 
+	       << "dynamic_usable_decay: " << dynamic_usable_decay << '\n'
+		   << "dynamic_usable_max: " << dynamic_usable_max << '\n'
+
 	       << "dynamic_step: " << dynamic_step << '\n'
 	       << "dynamic_decay: " << dynamic_decay << '\n'
 	       << "diffusion: " << diffusion << "\n\n";
