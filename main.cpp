@@ -23,13 +23,14 @@ const index_t DIM = 100;
 
 sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m);
 
-void drawSquare(JiMP2::BMP &b, sim::vec2 pos){
-	const int C = 15;
-	pos.x *= C;
-	pos.y *= C;
-	for(auto i = pos.x; i < pos.x+C; ++i)
-		for(auto j = pos.y; j < pos.y+C; ++j)
-			b.setPixel(i, j+1, 0, 0, 0);
+void drawSquare(
+	JiMP2::BMP &bitmap, sim::vec2 pos, int SIZE, uint8_t r, uint8_t g, uint8_t b){
+
+	pos.x *= SIZE;
+	pos.y *= SIZE;
+	for(auto i = pos.x; i < pos.x+SIZE; ++i)
+		for(auto j = pos.y; j < pos.y+SIZE; ++j)
+			bitmap.setPixel(i, j+1, r, g, b);
 }
 
 int main(){
@@ -51,6 +52,7 @@ int main(){
 	sim::Simulation::Viewer viewer(simul);
 
 	const index_t D = viewer.getDimension();
+	const int SIZE = 32;
 
 	// Static field printout.
 	/*JiMP2::BMP sf(D, D);
@@ -65,22 +67,35 @@ int main(){
 	sfw << sf;
 	sfw.close();*/
 
-	for(int i=0; i!=100; ++i){
-		JiMP2::BMP b(D*15, D*15);
+	for(int i=0; i!=200; ++i){
+		JiMP2::BMP b(D*SIZE, D*SIZE);
 		std::stringstream ss;
 		ss << "dump/" << i+1 << ".bmp";
 		std::ofstream writer(ss.str());
 		if(!writer)
 			break;
 		
+		// Pedestrians.
 		for(const auto &p : viewer.getPedestrians())
-			drawSquare(b, {p.second.getPosition().x, p.second.getPosition().y});
+			drawSquare(b, p.second.getPosition(), SIZE, 0, 0, 0);
+
+		// Walls.
+		for(const auto &w : viewer.getWalls())
+			drawSquare(b, w, SIZE, 0x66, 0x33, 0);
+
+		// Exits.
+		for(const auto &x : viewer.getExits())
+			drawSquare(b, x, SIZE, 0x66, 0xff, 0xff);
+
+		const auto &df = viewer.getDynamicField();
+		for(index_t y=0; y!=16; ++y)
+			for(index_t x=0; x!=16; ++x){
+				drawSquare(b, {x*2, y*2}, SIZE/2, 255, 255-20*df(x, y), 255-30*df(x, y));
+			}
 
 		writer << b;
 		writer.close();
 
 		simul.runStep();
 	}
-
-	// shot.writeToFile("output_test.map");
 }

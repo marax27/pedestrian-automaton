@@ -1,5 +1,5 @@
 CPP = g++
-FLAGS = -Wall -Wextra -pedantic -std=c++11 -g
+FLAGS = -Wall -Wextra -pedantic -std=c++11
 PROJ_NAME = project
 OBJS = main.o snapshot.o config.o simulation.o bmp.o
 
