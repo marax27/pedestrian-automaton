@@ -108,6 +108,11 @@ private:
 				!= data.exits.end();
 	}
 
+	inline bool isWall(vec2 pos) const {
+		return std::find(data.walls.begin(), data.walls.end(), pos)
+				!= data.walls.end();
+	}
+
 	// Get usable value of dynamic field at given position.
 	// Note: usable value != raw dynamic field value
 	// 0 <= Dij < +inf

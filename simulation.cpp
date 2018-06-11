@@ -30,21 +30,19 @@ void Simulation::runStep(){
 		// Get dynamic field.
 		Matrix<fp_t, 3, 3> D = neighbourhoodDynamicField(pos);
 
+		// Probability matrix.
+		Matrix<fp_t, 3, 3> P = S * N.as<fp_t>() * D;
+
 		/*std::cerr << '(' << pos.x << ", " << pos.y << ")\n";
 		for(int y=0; y!=3; ++y){
 			for(int x=0; x!=3; ++x)
-				std::cerr << N(x,y) << ' ';
-			std::cerr << "   ";
-			for(int x=0; x!=3; ++x)
-				std::cerr << S(x,y) << ' ';
+				std::cerr << D(x,y) << ' ';
 			std::cerr << '\n';
 		}
 		std::cerr << '\n';*/
 
-		// Probability matrix.
-		Matrix<fp_t, 3, 3> P = S * N.as<fp_t>() * D;
-
 		vec2 new_pos = randomMatrixElement(P);
+
 		// Coords of new_pos contains values from {0, 1, 2},
 		// which represent pedestrian's offset:  {-1, 0, 1}.
 		// Since index_t is unsigned, one should avoid diving below 0.
@@ -77,9 +75,15 @@ void Simulation::runStep(){
 			data.dynamic_field(x, y) -= delta;
 
 			// Diffusion.
-			int rnd = rand() % 9;  // Picking random neighbour.
-			                       // Picking itself is also possible.
-			data.dynamic_field.at(x + rnd%3 - 1, y + (rnd - rnd%3)/3 - 1) += delta;
+			int rnd;
+			vec2 shifted;
+			do{
+				rnd = rand() % 9;  // Picking random neighbour.
+				                   // Picking itself is also possible.
+				shifted = {x + rnd%3 - 1, y + (rnd - rnd%3)/3 - 1};
+			}while(isWall(shifted));  //Do not diffuse into walls.
+
+			data.dynamic_field.at(shifted.x, shifted.y) += delta;
 		}
 	}
 
@@ -224,7 +228,7 @@ fp_t Simulation::dynamicValue(vec2 pos) const {
 		return 0.0;
 	return config.dynamic_usable_max * (
 		1 - exp(-config.dynamic_usable_decay * data.dynamic_field(pos.x, pos.y))
-	);
+	) + 1e-10;
 }
 
 //************************************************************
