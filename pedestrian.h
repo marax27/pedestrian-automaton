@@ -20,11 +20,6 @@ public:
 		position = new_pos;
 	}
 
-	void move(vec2 new_pos){
-		position.x = new_pos.x;
-		position.y = new_pos.y;
-	}
-
 	bool operator==(const Pedestrian &p) const {
 		return position == p.position;
 	}
