@@ -78,6 +78,22 @@ void Config::readFromFile(const std::string &filename){
 		}
 	}
 
+	// Verify constants.
+	if(static_decay <= 0.0)
+		Output::printWarning("Nonpositive 'static_decay'.");
+	if(max <= min || min <= 0.0)
+		Output::printWarning("'max' should be greater than 'min' and both should be positive.");
+	if(dynamic_usable_decay <= 0.0)
+		Output::printWarning("Nonpositive 'dynamic_usable_decay'.");
+	if(dynamic_usable_max <= 0.0)
+		Output::printWarning("Nonpositive 'dynamic_usable_max'.");
+	if(dynamic_step <= 0.0)
+		Output::printWarning("Nonpositive 'dynamic_step'.");
+	if(dynamic_decay <= 0.0 || dynamic_decay >= 100.0)
+		Output::printWarning("'dynamic_decay' should be in range from 0 to 100.");
+	if(diffusion <= 0.0 || diffusion >= 100.0)
+		Output::printWarning("'diffusion' should be in range from 0 to 100.");
+
 	reader.close();
 }
 
