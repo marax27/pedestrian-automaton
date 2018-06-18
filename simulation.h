@@ -34,7 +34,7 @@ public:
 	//------------------------------
 	class Viewer{
 	public:
-		Viewer(Simulation &instance) : target(instance) {}
+		Viewer(const Simulation &instance) : target(instance) {}
 
 		const std::map<uid_t, Pedestrian>& getPedestrians() const {
 			return target.data.pedestrians;
@@ -65,7 +65,7 @@ public:
 		}
 
 	private:
-		Simulation &target;
+		const Simulation &target;
 	};
 	//------------------------------
 	class SimulationException : public std::exception {};

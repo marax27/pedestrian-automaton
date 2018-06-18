@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdlib>
 
+#include "chart.h"
 #include "config.h"
 #include "snapshot.h"
 #include "simulation.h"
@@ -28,9 +29,9 @@ void drawSquare(
 
 	pos.x *= SIZE;
 	pos.y *= SIZE;
-	for(auto i = pos.x; i < pos.x+SIZE; ++i)
-		for(auto j = pos.y; j < pos.y+SIZE; ++j)
-			bitmap.setPixel(i, j+1, r, g, b);
+	for(uint16_t i = pos.x; i < pos.x+SIZE; ++i)
+		for(uint16_t j = pos.y; j < pos.y+SIZE; ++j)
+			bitmap.setPixel({i, j}, r, g, b);
 }
 
 //************************************************************
@@ -44,7 +45,7 @@ int main(){
 	sim::Config conf;
 	conf.readFromFile("inputs/winner.conf");
 
-	sim::Simulation simul(std::move(shot), conf);
+	sim::Simulation simul(shot, conf);
 
 	cout << "Size: " << shot.dimension << 'x' << shot.dimension << '\n'
 	     << shot.exits.size() << " exits.\n"
@@ -52,6 +53,7 @@ int main(){
 		 << shot.walls.size() << " walls.\n";
 
 	sim::Simulation::Viewer viewer(simul);
+	sim::PopulationChart pchart(simul);
 
 	const index_t D = viewer.getDimension();
 	const int SIZE = 32;
@@ -86,6 +88,10 @@ int main(){
 		writer << b;
 		writer.close();
 
+		pchart.read();
+
 		simul.runStep();
 	}
+
+	pchart.draw("dump/population.bmp");
 }

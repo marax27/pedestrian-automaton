@@ -30,18 +30,44 @@ BMP::~BMP() {
 	delete[] pixelData;
 }
 
-void BMP::setPixel(uint16_t x, uint16_t y, unsigned char r, unsigned char g,
+void BMP::setPixel(Point p, unsigned char r, unsigned char g,
 		unsigned char b) {
 	assert(bitmapCoreHeader.bitsPerPixel == 24);
+	p.y += 1;
 
 	const size_t rowSize = ((bitmapCoreHeader.bitsPerPixel
 			* bitmapCoreHeader.bmpWidth + 31) / 32) * 4;
-	const size_t offset = rowSize * (bitmapCoreHeader.bmpHeight - y)
-			+ x * (bitmapCoreHeader.bitsPerPixel / 8);
+	const size_t offset = rowSize * (bitmapCoreHeader.bmpHeight - p.y)
+			+ p.x * (bitmapCoreHeader.bitsPerPixel / 8);
 
 	pixelData[offset + 0] = b;
 	pixelData[offset + 1] = g;
 	pixelData[offset + 2] = r;
+}
+
+void BMP::drawLine(
+	Point A, Point B, 
+	unsigned char r, unsigned char g, unsigned char b){
+	
+	int dx =  abs (B.x - A.x), sx = A.x < B.x ? 1 : -1,
+	    dy = -abs (B.y - A.y), sy = A.y < B.y ? 1 : -1; 
+	int err = dx + dy,
+	    e2;
+ 
+	while(true){
+		setPixel(A, r, g, b);
+		if(A.x == B.x && A.y == B.y)
+			break;
+		e2 = 2*err;
+		if(e2 >= dy){
+			err += dy;
+			A.x += sx;
+		}
+		if(e2 <= dx){
+			err += dx;
+			A.y += sy;
+		}
+	}
 }
 
 std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
