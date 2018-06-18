@@ -62,6 +62,9 @@ public:
 	void drawLine(Point A, Point B, unsigned char r, unsigned char g,
 			unsigned char b);
 
+	void drawFillRect(Point A, Point B, unsigned char r, unsigned char g,
+			unsigned char b);
+
 	uint16_t getWidth() const { return bitmapCoreHeader.bmpWidth; }
 	uint16_t getHeight() const { return bitmapCoreHeader.bmpHeight; }
 

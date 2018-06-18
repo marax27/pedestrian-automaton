@@ -70,6 +70,18 @@ void BMP::drawLine(
 	}
 }
 
+void BMP::drawFillRect(Point A, Point B, 
+		unsigned char r, unsigned char g, unsigned char b){
+	
+	if(A.x > B.x)
+		std::swap(A.x, B.x);
+	if(A.y > B.y)
+		std::swap(A.y, B.y);
+
+	for(auto y = A.y; y <= B.y; ++y)
+		drawLine({A.x, y}, {B.x, y}, r, g, b);
+}
+
 std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
 	os.write(bmp.bmpFileHeader.id, sizeof(bmp.bmpFileHeader.id));
 	os.write((const char*) &bmp.bmpFileHeader.size,
