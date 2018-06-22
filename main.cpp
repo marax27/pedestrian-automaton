@@ -13,6 +13,7 @@
 #include "config.h"
 #include "snapshot.h"
 #include "simulation.h"
+#include "snapshot_drawer.h"
 
 #include "bmp.h"
 
@@ -52,41 +53,16 @@ int main(){
 		 << shot.pedestrians.size() << " pedestrians.\n"
 		 << shot.walls.size() << " walls.\n";
 
-	sim::Simulation::Viewer viewer(simul);
+	// sim::Simulation::Viewer viewer(simul);
+	sim::SnapshotDrawer sd(simul,
+		sim::PEDESTRIANS|sim::WALLS|sim::EXITS|sim::DYNAMIC_FIELD);
 	sim::PopulationChart pchart(simul);
 
-	const index_t D = viewer.getDimension();
-	const int SIZE = 32;
-
-	for(int i=0; i!=200; ++i){
-		JiMP2::BMP b(D*SIZE, D*SIZE);
+	for(int i=0; i!=100; ++i){
 		std::stringstream ss;
 		ss << "dump/" << i+1 << ".bmp";
-		std::ofstream writer(ss.str());
-		if(!writer)
-			break;
-
-		// Walls.
-		for(const auto &w : viewer.getWalls())
-			drawSquare(b, w, SIZE, 0x66, 0x33, 0);
-
-		// Exits.
-		for(const auto &x : viewer.getExits())
-			drawSquare(b, x, SIZE, 0x66, 0xff, 0xff);
-
-		// Pedestrians.
-		for(const auto &p : viewer.getPedestrians())
-			drawSquare(b, p.second.getPosition(), SIZE, 0, 0, 0);
-
-		auto trim20 = [](int c){ return c<0 ? 0 : c; };
-		const auto &df = viewer.getDynamicField();
-		for(index_t y=0; y!=viewer.getDimension(); ++y)
-			for(index_t x=0; x!=viewer.getDimension(); ++x){
-				drawSquare(b, {x*2, y*2}, SIZE/2, 255, trim20(255-20*df(x, y)), trim20(255-30*df(x, y)));
-			}
-
-		writer << b;
-		writer.close();
+		
+		sd.readAndDraw(ss.str());
 
 		pchart.read();
 

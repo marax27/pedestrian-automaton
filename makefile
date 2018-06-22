@@ -1,12 +1,12 @@
 CPP = g++
-FLAGS = -Wall -Wextra -pedantic -std=c++11
+FLAGS = -Wall -Wextra -pedantic -std=c++17 -g
 PROJ_NAME = project
-OBJS = main.o snapshot.o config.o simulation.o bmp.o
+OBJS = main.o snapshot.o config.o simulation.o bmp.o snapshot_drawer.o
 
 all: $(OBJS)
 	$(CPP) $(FLAGS) $(OBJS) -o $(PROJ_NAME)
 
-main.o: main.cpp matrix.h misc.h output.h pedestrian.h field.h
+main.o: main.cpp matrix.h misc.h output.h pedestrian.h field.h chart.h snapshot_drawer.h
 	$(CPP) $(FLAGS) main.cpp -c -o main.o
 
 snapshot.o: snapshot.cpp snapshot.h pedestrian.h field.h uid.h file_format.h
@@ -20,6 +20,9 @@ simulation.o: simulation.cpp simulation.h snapshot.h matrix.h pedestrian_priorit
 
 bmp.o: bmp.cpp bmp.h
 	$(CPP) $(FLAGS) bmp.cpp -c -o bmp.o
+
+snapshot_drawer.o: snapshot_drawer.cpp snapshot_drawer.h simulation.h bmp.h
+	$(CPP) $(FLAGS) snapshot_drawer.cpp -c -o snapshot_drawer.o
 
 clean:
 	rm -f *.o $(PROJ_NAME) a.out
