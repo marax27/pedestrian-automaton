@@ -35,11 +35,14 @@ void BMP::setPixel(Point p, unsigned char r, unsigned char g,
 	assert(bitmapCoreHeader.bitsPerPixel == 24);
 	p.y += 1;
 
+	if(p.y > bitmapCoreHeader.bmpHeight || p.x > bitmapCoreHeader.bmpWidth)
+		return;
+
 	const size_t rowSize = ((bitmapCoreHeader.bitsPerPixel
 			* bitmapCoreHeader.bmpWidth + 31) / 32) * 4;
 	const size_t offset = rowSize * (bitmapCoreHeader.bmpHeight - p.y)
 			+ p.x * (bitmapCoreHeader.bitsPerPixel / 8);
-
+	
 	pixelData[offset + 0] = b;
 	pixelData[offset + 1] = g;
 	pixelData[offset + 2] = r;
@@ -78,7 +81,7 @@ void BMP::drawFillRect(Point A, Point B,
 	if(A.y > B.y)
 		std::swap(A.y, B.y);
 
-	for(auto y = A.y; y <= B.y; ++y)
+	for(int y = A.y; y <= B.y; ++y)
 		drawLine({A.x, y}, {B.x, y}, r, g, b);
 }
 

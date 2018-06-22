@@ -22,6 +22,8 @@ public:
 	// Assignment.
 
 	Field& operator=(const Field &model){
+		if(this == &model)
+			return *this;
 		free();
 		size = model.size;
 		copyElements(model);
@@ -29,6 +31,8 @@ public:
 	}
 
 	Field& operator=(Field &&model){
+		if(this == &model)
+			return *this;
 		free();
 		data = model.data;
 		size = model.size;

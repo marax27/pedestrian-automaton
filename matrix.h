@@ -22,12 +22,16 @@ public:
 	// Assignment.
 
 	Matrix& operator=(const Matrix &model){
+		if(this == &model)
+			return *this;
 		free();
 		copyElements(model);
 		return *this;
 	}
 
 	Matrix& operator=(Matrix &&model){
+		if(this == &model)
+			return *this;
 		free();
 		data = model.data;
 		model.data = nullptr;  //is it necessary?

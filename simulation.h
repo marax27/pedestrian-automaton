@@ -30,7 +30,7 @@ public:
 	// Simulation progress - 1 step per function call.
 	void runStep();
 
-	// An interface for simulation's data access.
+	// Interface for simulation's data access (read-only).
 	//------------------------------
 	class Viewer{
 	public:
@@ -66,6 +66,17 @@ public:
 
 	private:
 		const Simulation &target;
+	};
+	//------------------------------
+	// Interface for simulation's data access (write-only).
+	class Modifier{
+	public:
+		Modifier(Simulation &instance) : target(instance) {}
+
+		Config& config(){ return target.config; }
+
+	private:
+		Simulation &target;
 	};
 	//------------------------------
 	class SimulationException : public std::exception {};
@@ -120,6 +131,7 @@ private:
 	fp_t dynamicValue(vec2 pos) const;
 
 	friend class Viewer;
+	friend class Modifier;
 };
 
 }

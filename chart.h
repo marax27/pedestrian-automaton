@@ -42,9 +42,15 @@ public:
 			return static_cast<int>(h * (fp_t)(n) / max_n);
 		};
 
+		// Grid.
+		unsigned char gs = 0xaa;
+		bmp.drawLine(Point(0, h/4), Point(w, h/4), gs, gs, gs);
+		bmp.drawLine(Point(0, h/2), Point(w, h/2), gs, gs, gs);
+		bmp.drawLine(Point(0, 3*h/4), Point(w, 3*h/4), gs, gs, gs);
+
 		for(std::size_t i = 0; i != data.size(); ++i){
 			int y = h - norm(data[i]);
-			bmp.drawLine(Point(i*STEP, y), Point((i+1)*STEP, y), 0, 0, 0);
+			bmp.drawLine(Point(i*STEP, y), Point((i+1)*STEP, y), 0xff, 0, 0);
 		}
 
 		std::ofstream writer(filename, std::ios::binary);
