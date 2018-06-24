@@ -19,13 +19,13 @@ enum e_DrawFlag : uint8_t {
 typedef uint8_t DrawingFlags;
 //------------------------------
 
-class SnapshotDrawer : protected Simulation::Viewer {
+class SnapshotDrawer{
 public:
 
-	SnapshotDrawer(const Simulation &instance, DrawingFlags drawing_flags)
-		: Viewer(instance), flags(drawing_flags), cell_size(32) {}
+	SnapshotDrawer(DrawingFlags drawing_flags)
+		: flags(drawing_flags), cell_size(32) {}
 
-	void readAndDraw(const std::string &filename);
+	void draw(const Snapshot &snapshot, const std::string &filename);
 
 private:
 	DrawingFlags flags;

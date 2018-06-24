@@ -25,23 +25,13 @@ const index_t DIM = 100;
 
 sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m);
 
-void drawSquare(
-	JiMP2::BMP &bitmap, sim::vec2 pos, int SIZE, uint8_t r, uint8_t g, uint8_t b){
-
-	pos.x *= SIZE;
-	pos.y *= SIZE;
-	for(uint16_t i = pos.x; i < pos.x+SIZE; ++i)
-		for(uint16_t j = pos.y; j < pos.y+SIZE; ++j)
-			bitmap.setPixel({i, j}, r, g, b);
-}
-
 //************************************************************
 
 int main(){
 	srand(time(NULL));
 
 	sim::Snapshot shot;
-	shot.readFromFile("inputs/bigroom.map");
+	shot.readFromFile("inputs/bigroom-walls.map");
 
 	sim::Config conf;
 	conf.readFromFile("inputs/winner.conf");
@@ -53,21 +43,19 @@ int main(){
 		 << shot.pedestrians.size() << " pedestrians.\n"
 		 << shot.walls.size() << " walls.\n";
 
-	// sim::Simulation::Viewer viewer(simul);
-	sim::SnapshotDrawer sd(simul,
+	sim::Simulation::Viewer viewer(simul);
+	sim::SnapshotDrawer sd(
 		sim::PEDESTRIANS|sim::WALLS|sim::EXITS|sim::DYNAMIC_FIELD);
-	sim::PopulationChart pchart(simul);
+	sim::PopulationChart pchart(simul, {0xff, 0, 0});
 
-	for(int i=0; i!=100; ++i){
+	for(int i=0; i!=200; ++i){
 		std::stringstream ss;
 		ss << "dump/" << i+1 << ".bmp";
 		
-		sd.readAndDraw(ss.str());
-
-		pchart.read();
-
+		sd.draw(viewer.getSnapshot(), ss.str());
+		pchart.update();
 		simul.runStep();
 	}
 
-	pchart.draw("dump/population.bmp");
+	pchart.saveToFile("dump/population.bmp");
 }

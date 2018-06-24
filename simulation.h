@@ -64,6 +64,10 @@ public:
 			return target.static_field;
 		}
 
+		const Snapshot& getSnapshot() const {
+			return target.data;
+		}
+
 	private:
 		const Simulation &target;
 	};

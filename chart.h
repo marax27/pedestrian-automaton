@@ -2,6 +2,7 @@
 #define _CHART_H_
 
 #include "simulation.h"
+#include "updateable.h"
 #include "bmp.h"
 
 #include <vector>
@@ -11,26 +12,28 @@
 
 namespace sim{
 
-class Chart : protected Simulation::Viewer {
+class Chart : protected Simulation::Viewer, public Updateable {
 public:
-	Chart(const Simulation &instance) : Viewer(instance) {}
-
-	// Read necessary data from Simulation object.
-	virtual void read() = 0;
+	Chart(const Simulation &instance, Colour clr)
+		: Viewer(instance), chart_colour(clr) {}
+	
+protected:
+	Colour chart_colour;
 };
 
 //************************************************************
 
 class PopulationChart : public Chart {
 public:
-	PopulationChart(const Simulation &instance) : Chart(instance) {}
+	PopulationChart(const Simulation &instance, Colour clr)
+		: Chart(instance, clr) {}
 
-	void read() {
+	void update() {
 		data.push_back( Chart::getPedestrians().size() );
 	}
 
 	// Save a chart in a BMP file.
-	void draw(const std::string &filename) const {
+	void saveToFile(const std::string &filename) const {
 		const int STEP = 5;
 		int w = data.size() * STEP;
 		int h = 100;
@@ -44,13 +47,23 @@ public:
 
 		// Grid.
 		unsigned char gs = 0xaa;
-		bmp.drawLine(Point(0, h/4), Point(w, h/4), gs, gs, gs);
-		bmp.drawLine(Point(0, h/2), Point(w, h/2), gs, gs, gs);
-		bmp.drawLine(Point(0, 3*h/4), Point(w, 3*h/4), gs, gs, gs);
+		bmp.drawLine(Point(0, h/4), Point(w, h/4), Colour::greyScale(gs));
+		bmp.drawLine(Point(0, h/2), Point(w, h/2), Colour::greyScale(gs));
+		bmp.drawLine(Point(0, 3*h/4), Point(w, 3*h/4), Colour::greyScale(gs));
 
 		for(std::size_t i = 0; i != data.size(); ++i){
 			int y = h - norm(data[i]);
-			bmp.drawLine(Point(i*STEP, y), Point((i+1)*STEP, y), 0xff, 0, 0);
+			bmp.drawLine(Point(i*STEP, y), Point((i+1)*STEP, y), chart_colour);
+			if(i > 0){
+				// Vertical line, if the gap between horizontal
+				// lines is too large.
+				auto y1 = h - norm(data[i]),
+				     y2 = h - norm(data[i-1]);
+				if(abs(y2 - y1) > 1){
+					bmp.drawLine(Point(i*STEP, y1), Point(i*STEP, y2),
+						chart_colour);
+				}
+			}
 		}
 
 		std::ofstream writer(filename, std::ios::binary);

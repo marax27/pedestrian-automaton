@@ -30,8 +30,7 @@ BMP::~BMP() {
 	delete[] pixelData;
 }
 
-void BMP::setPixel(Point p, unsigned char r, unsigned char g,
-		unsigned char b) {
+void BMP::setPixel(Point p, Colour clr) {
 	assert(bitmapCoreHeader.bitsPerPixel == 24);
 	p.y += 1;
 
@@ -43,14 +42,13 @@ void BMP::setPixel(Point p, unsigned char r, unsigned char g,
 	const size_t offset = rowSize * (bitmapCoreHeader.bmpHeight - p.y)
 			+ p.x * (bitmapCoreHeader.bitsPerPixel / 8);
 	
-	pixelData[offset + 0] = b;
-	pixelData[offset + 1] = g;
-	pixelData[offset + 2] = r;
+	pixelData[offset + 0] = clr.b;
+	pixelData[offset + 1] = clr.g;
+	pixelData[offset + 2] = clr.r;
 }
 
 void BMP::drawLine(
-	Point A, Point B, 
-	unsigned char r, unsigned char g, unsigned char b){
+	Point A, Point B, Colour clr){
 	
 	int dx =  abs (B.x - A.x), sx = A.x < B.x ? 1 : -1,
 	    dy = -abs (B.y - A.y), sy = A.y < B.y ? 1 : -1; 
@@ -58,7 +56,7 @@ void BMP::drawLine(
 	    e2;
  
 	while(true){
-		setPixel(A, r, g, b);
+		setPixel(A, clr);
 		if(A.x == B.x && A.y == B.y)
 			break;
 		e2 = 2*err;
@@ -73,8 +71,7 @@ void BMP::drawLine(
 	}
 }
 
-void BMP::drawFillRect(Point A, Point B, 
-		unsigned char r, unsigned char g, unsigned char b){
+void BMP::drawFillRect(Point A, Point B, Colour clr){
 	
 	if(A.x > B.x)
 		std::swap(A.x, B.x);
@@ -82,7 +79,7 @@ void BMP::drawFillRect(Point A, Point B,
 		std::swap(A.y, B.y);
 
 	for(int y = A.y; y <= B.y; ++y)
-		drawLine({A.x, y}, {B.x, y}, r, g, b);
+		drawLine({A.x, y}, {B.x, y}, clr);
 }
 
 std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
