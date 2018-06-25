@@ -37,7 +37,7 @@ int main(int argc, char **argv){
 	shot.readFromFile("inputs/bigroom-walls.map");
 
 	sim::Config conf;
-	conf.readFromFile("inputs/winner.conf");
+	conf.readFromFile("inputs/standard_settings.conf");
 
 	// Initialize simulation.
 	sim::Simulation simul(shot, conf);
