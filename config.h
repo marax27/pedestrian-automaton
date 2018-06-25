@@ -18,7 +18,8 @@ public:
 
 	fp_t static_decay = 0.25,
 	     max = 1.0,
-	     min = 0.0;
+	     min = 0.0,
+		 static_strength = 1.0;
 	
 	e_NeighbourhoodType neighbourhood;
 
@@ -27,7 +28,8 @@ public:
 	
 	fp_t dynamic_step = 1.0,
 	     dynamic_decay = 0.1,
-	     diffusion = 0.9;
+	     diffusion = 0.9,
+	     dynamic_strength = 1.0;
 
 	virtual void readFromFile(const std::string &filename);
 	

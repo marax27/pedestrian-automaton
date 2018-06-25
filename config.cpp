@@ -45,6 +45,8 @@ void Config::readFromFile(const std::string &filename){
 				tokenizer >> max;
 			else if(token == "min")
 				tokenizer >> min;
+			else if(token == "static_strength")
+				tokenizer >> static_strength;
 			else if(token == "neighbourhood"){
 				tokenizer >> token;
 				if(token == "von_neumann")
@@ -66,6 +68,8 @@ void Config::readFromFile(const std::string &filename){
 				tokenizer >> dynamic_decay;
 			else if(token == "diffusion")
 				tokenizer >> diffusion;
+			else if(token == "dynamic_strength")
+				tokenizer >> dynamic_strength;
 			else{
 				Output::printError(err1 + "Unknown token: '{}'.", token);
 				throw FileFormat::FileReadException();
@@ -83,6 +87,8 @@ void Config::readFromFile(const std::string &filename){
 		Output::printWarning("Nonpositive 'static_decay'.");
 	if(max <= min || min <= 0.0)
 		Output::printWarning("'max' should be greater than 'min' and both should be positive.");
+	if(static_strength <= 0.0)
+		Output::printWarning("Nonpositive 'static_strength'.");
 	if(dynamic_usable_decay <= 0.0)
 		Output::printWarning("Nonpositive 'dynamic_usable_decay'.");
 	if(dynamic_usable_max <= 0.0)
@@ -93,6 +99,8 @@ void Config::readFromFile(const std::string &filename){
 		Output::printWarning("'dynamic_decay' should be in range from 0 to 100.");
 	if(diffusion <= 0.0 || diffusion >= 100.0)
 		Output::printWarning("'diffusion' should be in range from 0 to 100.");
+	if(dynamic_strength <= 0.0)
+		Output::printWarning("Nonpositive 'dynamic_strength'.");
 
 	reader.close();
 }
@@ -108,7 +116,8 @@ void Config::writeToFile(const std::string &filename) const {
 
 	writer << "static_decay: " << static_decay << '\n'
 	       << "max: " << max << '\n'
-	       << "min: " << min << "\n\n"
+	       << "min: " << min << '\n'
+		   << "static_strength: " << static_strength << "\n\n"
 
 	       << "neighbourhood: " << (neighbourhood == MOORE ? "moore" : "von_neumann") << "\n\n"
 
@@ -117,7 +126,8 @@ void Config::writeToFile(const std::string &filename) const {
 
 	       << "dynamic_step: " << dynamic_step << '\n'
 	       << "dynamic_decay: " << dynamic_decay << '\n'
-	       << "diffusion: " << diffusion << "\n\n";
+	       << "diffusion: " << diffusion << '\n'
+		   << "dynamic_strength: " << dynamic_strength << "\n\n";
 
 	writer.close();
 }
