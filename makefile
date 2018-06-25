@@ -6,7 +6,7 @@ OBJS = main.o snapshot.o config.o simulation.o bmp.o snapshot_drawer.o
 all: $(OBJS)
 	$(CPP) $(FLAGS) $(OBJS) -o $(PROJ_NAME)
 
-main.o: main.cpp matrix.h misc.h output.h pedestrian.h field.h chart.h snapshot_drawer.h
+main.o: main.cpp matrix.h misc.h output.h pedestrian.h progress_bar.h field.h chart.h updateable.h snapshot_drawer.h
 	$(CPP) $(FLAGS) main.cpp -c -o main.o
 
 snapshot.o: snapshot.cpp snapshot.h pedestrian.h field.h uid.h file_format.h

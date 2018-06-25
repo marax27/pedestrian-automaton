@@ -52,8 +52,16 @@ void Simulation::runStep(){
 		// Increment dynamic field of a cell now occupied by a pedestrian,
 		// unless pedestrian didn't move at all.
 		if(new_pos != vec2{1, 1}){
+			fp_t heterogeneity = 0.0f;
+			fp_t sum = 0.0f;
+			for(sim::index_t i = 0; i != 9; ++i)
+				sum += P(i%3, (i - i%3)/3);
+			for(sim::index_t i = 0; i != 9; ++i)
+				heterogeneity += squared(P(i%3, (i - i%3)/3));
+			heterogeneity = 1 - exp(-8.0*(heterogeneity / sum));
+
 			auto &cell = data.dynamic_field.at(pos.x, pos.y);
-			cell += config.dynamic_step;
+			cell += heterogeneity * config.dynamic_step;
 		}
 
 		pqueue->pop();
