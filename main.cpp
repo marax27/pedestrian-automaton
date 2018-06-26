@@ -23,9 +23,17 @@ using sim::fp_t;
 using sim::index_t;
 using std::cout;
 
-const index_t DIM = 100;
-
 sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m);
+void processArgc(int argc, char **argv);
+
+namespace{
+	// const index_t DIM = 100;
+
+	struct{
+		bool save_bitmaps = false,
+		     signal_progress = true;
+	} ConsoleSettings;
+}
 
 //************************************************************
 
@@ -47,15 +55,7 @@ int main(int argc, char **argv){
 		 << shot.pedestrians.size() << " pedestrians.\n"
 		 << shot.walls.size() << " walls.\n";
 
-	bool b_save_bitmaps = true,
-	     b_signal_progress = false;
-
-	for(int i = 1; i != argc; ++i){
-		if(argv[i] == std::string{"--no-bitmap"})
-			b_save_bitmaps = false;
-		else if(argv[i] == std::string("--signal-progress"))
-			b_signal_progress = true;
-	}
+	processArgc(argc, argv);
 
 	sim::Simulation::Viewer viewer(simul);
 	sim::SnapshotDrawer sd(
@@ -69,16 +69,37 @@ int main(int argc, char **argv){
 		std::stringstream ss;
 		ss << "dump/" << i+1 << ".bmp";
 		
-		if(b_save_bitmaps)
+		if(ConsoleSettings.save_bitmaps)
 			sd.draw(viewer.getSnapshot(), ss.str());
 		pchart.update();
 		simul.runStep();
 
-		if(b_signal_progress){
+		if(ConsoleSettings.signal_progress){
 			pbar.shift(1);
-			std::cerr << pbar << '\r';
+			std::cout << pbar << '\r';
+			std::cout.flush();
 		}
 	}
 
 	pchart.saveToFile("dump/population.bmp");
+	std::cout << '\n';
 }
+
+//************************************************************
+
+void processArgc(int argc, char **argv){
+	for(int i = 1; i != argc; ++i){
+		if(argv[i] == std::string{"--no-save-bitmap"})
+			ConsoleSettings.save_bitmaps = false;
+		else if(argv[i] == std::string{"--save-bitmap"})
+			ConsoleSettings.save_bitmaps = true;
+		else if(argv[i] == std::string("--no-signal-progress"))
+			ConsoleSettings.signal_progress = false;
+		else if(argv[i] == std::string{"--signal-progress"})
+			ConsoleSettings.signal_progress = true;
+		else
+			sim::Output::printWarning("Unknown argument: '{}'", argv[i]);
+	}
+}
+
+//************************************************************
