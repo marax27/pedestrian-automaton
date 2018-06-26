@@ -2,6 +2,7 @@
 #define _PROGRESS_BAR_H
 
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 
 template<typename T> class ProgressBar;
@@ -9,10 +10,24 @@ template<typename T> class ProgressBar;
 template<typename T>
 std::ostream& operator<<(std::ostream &out, const ProgressBar<T> &pbar){
 	int total_len = pbar.length - 2;
-	int fill_len = pbar.current * static_cast<float>(total_len) / pbar.max_val;
-	// out << '[' << std::setfill('|') << std::setw(fill_len)
-	    // << std::setfill('-') << std::setw(total_len - fill_len) << ']';
-	out << '[' << std::string(fill_len, '|') + std::string(total_len-fill_len, ' ') << ']';
+	float f = pbar.current / static_cast<float>(pbar.max_val);
+	int fill_len = static_cast<int>(f * total_len);
+	std::stringstream ss;
+	std::string str1;
+
+	// if(total_len < 7)
+	ss << '[' << std::string(fill_len, '|') + std::string(total_len-fill_len, ' ') << ']';
+	str1 = ss.str();
+
+	if(total_len > 7){
+		ss.str(std::string());
+		ss << std::fixed << std::setprecision(1) << f*100.0f << '%';
+		std::string f_str = ss.str();
+		auto p0 = (str1.size() - f_str.size())/2;
+		str1.replace(p0, f_str.size(), f_str);
+	}
+
+	out << str1; //ss.str();
 	return out;
 }
 
