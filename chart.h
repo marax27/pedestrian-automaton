@@ -19,6 +19,20 @@ public:
 	
 protected:
 	Colour chart_colour;
+
+	static void drawGrid(JiMP2::BMP &bmp, int w, int h){
+		unsigned char gs = 0xaa;
+		Colour c = Colour::greyScale(gs);
+		int q = h/4;
+		for(int i = 1; i != 4; ++i)
+			bmp.drawLine(Point(0, i*q), Point(w, i*q), c);
+	}
+
+	static void saveBitmap(JiMP2::BMP &bmp, const std::string &fname){
+		std::ofstream writer(fname, std::ios::binary);
+		writer << bmp;
+		writer.close();
+	}
 };
 
 //************************************************************
@@ -45,11 +59,7 @@ public:
 			return static_cast<int>(h * (fp_t)(n) / max_n);
 		};
 
-		// Grid.
-		unsigned char gs = 0xaa;
-		bmp.drawLine(Point(0, h/4), Point(w, h/4), Colour::greyScale(gs));
-		bmp.drawLine(Point(0, h/2), Point(w, h/2), Colour::greyScale(gs));
-		bmp.drawLine(Point(0, 3*h/4), Point(w, 3*h/4), Colour::greyScale(gs));
+		drawGrid(bmp, w, h);
 
 		for(std::size_t i = 0; i != data.size(); ++i){
 			int y = h - norm(data[i]);
@@ -66,9 +76,7 @@ public:
 			}
 		}
 
-		std::ofstream writer(filename, std::ios::binary);
-		writer << bmp;
-		writer.close();
+		saveBitmap(bmp, filename);
 	}
 
 private:

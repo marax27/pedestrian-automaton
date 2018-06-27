@@ -47,6 +47,8 @@ int main(int argc, char **argv){
 	sim::Config conf;
 	conf.readFromFile("inputs/standard_settings.conf");
 
+	processArgc(argc, argv);
+
 	// Initialize simulation.
 	sim::Simulation simul(shot, conf);
 
@@ -54,8 +56,6 @@ int main(int argc, char **argv){
 	     << shot.exits.size() << " exits.\n"
 		 << shot.pedestrians.size() << " pedestrians.\n"
 		 << shot.walls.size() << " walls.\n";
-
-	processArgc(argc, argv);
 
 	sim::Simulation::Viewer viewer(simul);
 	sim::SnapshotDrawer sd(
