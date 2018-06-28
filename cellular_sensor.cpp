@@ -68,5 +68,42 @@ void MotionSensor::saveToFile(const std::string &filename) const {
 
 //************************************************************
 
+void DynamicSensor::update(){
+	data.push_back(CellularSensor::getSnapshot().dynamic_field(position.x, position.y));
+}
+
+void DynamicSensor::saveToFile(const std::string &filename) const {
+	const int STEP = 5;
+	int w = data.size() * STEP;
+	int h = 100;
+	JiMP2::BMP bmp(w, h);
+	auto max_n = *(std::max_element(data.begin(), data.end()));
+
+	// Linear normalization.
+	auto norm = [&h, &max_n](std::size_t n){
+		return static_cast<int>(h * (fp_t)(n) / max_n);
+	};
+
+	drawGrid(bmp, w, h);
+
+	for(std::size_t i = 0; i != data.size(); ++i){
+		int y = h - norm(data[i]) + 1;
+		bmp.drawLine(Point(i*STEP, y), Point((i+1)*STEP, y), chart_colour);
+		if(i > 0){
+			// Vertical line, if the gap between horizontal
+			// lines is too large.
+			auto y1 = h - norm(data[i]) + 1,
+			     y2 = h - norm(data[i-1]) + 1;
+			if(abs(y2 - y1) > 1){
+				bmp.drawLine(Point(i*STEP, y1), Point(i*STEP, y2),
+					chart_colour);
+			}
+		}
+	}
+
+	saveBitmap(bmp, filename);
+}
+
+//************************************************************
 
 }
