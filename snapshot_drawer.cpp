@@ -31,11 +31,13 @@ void SnapshotDrawer::draw(const Snapshot &snapshot, const std::string &filename)
 	}
 	if(flags & DYNAMIC_FIELD){
 		const auto &df = snapshot.dynamic_field;
+		fp_t avg = df.sum() / (df.dimension() * df.dimension());
+
 		for(index_t y = 0; y != DIM; ++y){
 			for(index_t x = 0; x != DIM; ++x){
 				int d = cell_size/4;
-				int t = 255 - 20*df(x, y);
-				uint8_t ut = static_cast<uint8_t>(t<0 ? 0 : t);
+				int t = 255 - 20*atLeastZero(df(x, y) - avg);
+				uint8_t ut = static_cast<uint8_t>(atLeastZero(t<0 ? 0 : t));
 
 				bmp.drawFillRect(Point(x*cell_size+d, y*cell_size+d),
 					Point(cell_size*(x+1)-d, cell_size*(y+1)-d), {0xff, ut, ut});

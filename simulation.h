@@ -68,6 +68,10 @@ public:
 			return target.data;
 		}
 
+		fp_t getAverageDynamicFieldValue() const {
+			return target.avg_dynamic_field;
+		}
+
 	private:
 		const Simulation &target;
 	};
@@ -95,6 +99,8 @@ private:
 	Field<fp_t> static_field;
 
 	PedestrianPriorityQueue<fp_t> *pqueue;
+
+	fp_t avg_dynamic_field;
 
 	void initializeSimulation(){
 		// Prepare the static field.

@@ -1,7 +1,7 @@
 CPP = g++
 FLAGS = -Wall -Wextra -pedantic -std=c++17 -O3 -pthread
 PROJ_NAME = project
-OBJS = main.o snapshot.o config.o simulation.o bmp.o snapshot_drawer.o
+OBJS = main.o snapshot.o config.o simulation.o bmp.o snapshot_drawer.o happiness.o
 
 all: $(OBJS)
 	$(CPP) $(FLAGS) $(OBJS) -o $(PROJ_NAME)
@@ -23,6 +23,9 @@ bmp.o: bmp.cpp bmp.h
 
 snapshot_drawer.o: snapshot_drawer.cpp snapshot_drawer.h simulation.h bmp.h
 	$(CPP) $(FLAGS) snapshot_drawer.cpp -c -o snapshot_drawer.o
+
+happiness.o: happiness.cpp
+	$(CPP) $(FLAGS) happiness.cpp -c -o happiness.o
 
 clean:
 	rm -f *.o $(PROJ_NAME) a.out

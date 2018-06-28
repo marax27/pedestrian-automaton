@@ -114,6 +114,9 @@ void Simulation::runStep(){
 		}
 	}
 
+	// Compute average value of dynamic field.
+	avg_dynamic_field = data.dynamic_field.sum() / (data.dimension * data.dimension);
+
 	delete pqueue;
 	pqueue = new_queue;
 
@@ -254,7 +257,7 @@ fp_t Simulation::dynamicValue(vec2 pos) const {
 	if(pos.x >= data.dynamic_field.dimension() || pos.y >= data.dynamic_field.dimension())
 		return 0.0;
 	return config.dynamic_usable_max * (
-		1 - exp(-config.dynamic_usable_decay * data.dynamic_field(pos.x, pos.y))
+		1 - exp(-config.dynamic_usable_decay * abs(data.dynamic_field(pos.x, pos.y) - avg_dynamic_field) )
 	) + 1e-10;
 }
 

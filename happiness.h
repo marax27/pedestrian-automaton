@@ -7,21 +7,24 @@ namespace sim{
 
 // Happiness.
 class HappinessMeasurement{
-	// Scale of happiness:
-	// -2 -1 0 1 2 3
-	// unhappy happy
+	const static int8_t MIN_STATE;
+	const static int8_t MAX_STATE;
 	int8_t counter;
 public:
-	HappinessMeasurement() : counter(2) {}
+	HappinessMeasurement() : counter(MAX_STATE) {}
 
 	void decrease(){
-		if(counter > -2)
+		if(counter > 0)
 			--counter;
+		else
+			counter = MIN_STATE;
 	}
 	
 	void increase(){
-		if(counter < 3)
+		if(counter < 0)
 			++counter;
+		else
+			counter = MAX_STATE;
 	}
 
 	bool isHappy() const { return counter > 0; }

@@ -47,6 +47,11 @@ inline T squared(T x){
 	return x*x;
 }
 
+template<typename T>
+inline T atLeastZero(T x){
+	return x < T() ? T() : x;
+}
+
 //************************************************************
 
 #endif  //_MISC_H_
