@@ -68,7 +68,7 @@ int main(int argc, char **argv){
 	// Initialize viewer objects.
 	sim::Simulation::Viewer viewer(simul);
 	sim::PopulationChart pchart(simul, {0xff, 0, 0});
-	sim::MotionSensor ms(simul, {20, 5});
+	sim::MotionSensor ms(simul, {19, 2});
 	sim::DynamicSensor ds(simul, {19, 2}, {0x22, 0x22, 0x99});  //before the exit
 
 	ProgressBar<int> pbar(STEPS, 0, PROGRESS_BAR_LENGTH);
@@ -97,7 +97,7 @@ int main(int argc, char **argv){
 	std::cout << '\n';
 
 	// Final operations.
-	ms.saveToFile("dump/motion-cell_20x5.txt");
+	ms.saveToFile("dump/motion-cell_19x2.txt");
 	pchart.saveToFile("dump/population.bmp");
 	ds.saveToFile("dump/dynamic-cell_19x2.bmp");
 

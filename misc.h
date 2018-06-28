@@ -53,6 +53,12 @@ inline T atLeastZero(T x){
 	return x < T() ? T() : x;
 }
 
+// Limit x to range [a, b].
+template<typename T>
+inline T limit(T a, T x, T b){
+	return (x < a) ? a : (x > b ? b : x);
+}
+
 template<typename T>
 T stringToValue(const std::string &s){
 	std::stringstream ss{s};

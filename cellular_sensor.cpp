@@ -87,13 +87,13 @@ void DynamicSensor::saveToFile(const std::string &filename) const {
 	drawGrid(bmp, w, h);
 
 	for(std::size_t i = 0; i != data.size(); ++i){
-		int y = h - norm(data[i]) + 1;
+		int y = limit(0, h - norm(data[i]), h-1);
 		bmp.drawLine(Point(i*STEP, y), Point((i+1)*STEP, y), chart_colour);
 		if(i > 0){
 			// Vertical line, if the gap between horizontal
 			// lines is too large.
-			auto y1 = h - norm(data[i]) + 1,
-			     y2 = h - norm(data[i-1]) + 1;
+			auto y1 = limit(0, h - norm(data[i]), h-1),
+			     y2 = limit(0, h - norm(data[i-1]), h-1);
 			if(abs(y2 - y1) > 1){
 				bmp.drawLine(Point(i*STEP, y1), Point(i*STEP, y2),
 					chart_colour);
