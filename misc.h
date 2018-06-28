@@ -2,6 +2,7 @@
 #define _MISC_H_
 
 #include <cstdint>
+#include <exception>
 
 #include "output.h"
 
@@ -50,6 +51,16 @@ inline T squared(T x){
 template<typename T>
 inline T atLeastZero(T x){
 	return x < T() ? T() : x;
+}
+
+template<typename T>
+T stringToValue(const std::string &s){
+	std::stringstream ss{s};
+	T result = T();
+	ss >> result;
+	if(ss.fail())
+		throw std::invalid_argument("Conversion from string to value failed.");
+	return result;
 }
 
 //************************************************************

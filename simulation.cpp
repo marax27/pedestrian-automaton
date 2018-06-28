@@ -61,7 +61,7 @@ void Simulation::runStep(){
 
 			// Take into account fields that are unoccupied.
 			if(S(_x,_y) && N(_x,_y) && vec2(_x,_y) != vec2(1,1)){
-				sum += P(current_pos.x, current_pos.y);
+				sum += S(current_pos.x, current_pos.y) * D(current_pos.x, current_pos.y);
 				++n;
 			}
 		}
