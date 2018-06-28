@@ -1,6 +1,3 @@
-#include "matrix.h"
-#include "field.h"
-
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -8,7 +5,11 @@
 
 #include <ctime>
 #include <cmath>
+#include <thread>
 #include <cstdlib>
+
+#include "matrix.h"
+#include "field.h"
 
 #include "chart.h"
 #include "config.h"
@@ -27,9 +28,13 @@ using std::cout;
 sim::vec2 randomMatrixElement(const Matrix<sim::fp_t, 3, 3> &m);
 void processArgc(int argc, char **argv);
 
+void thread_saveBitmaps(
+	const std::vector<sim::Snapshot> &v, int p, int q);
+
 namespace{
-	// const index_t DIM = 100;
 	index_t STEPS = 256;
+
+	const int PROGRESS_BAR_LENGTH = 40;
 
 	struct{
 		bool save_bitmaps = false,
@@ -54,28 +59,30 @@ int main(int argc, char **argv){
 	// Initialize simulation.
 	sim::Simulation simul(shot, conf);
 
+	// Print some information.
 	cout << "Size: " << shot.dimension << 'x' << shot.dimension << '\n'
 	     << shot.exits.size() << " exits.\n"
 		 << shot.pedestrians.size() << " pedestrians.\n"
 		 << shot.walls.size() << " walls.\n";
 
+	// Initialize viewer objects.
 	sim::Simulation::Viewer viewer(simul);
-	sim::SnapshotDrawer sd(
-		sim::PEDESTRIANS|sim::WALLS|sim::EXITS|sim::DYNAMIC_FIELD|sim::HAPPINESS, 8);
 	sim::PopulationChart pchart(simul, {0xff, 0, 0});
-
 	sim::MotionSensor ms({20, 5}, simul);
 
-	ProgressBar<int> pbar(STEPS, 0, 40);
+	ProgressBar<int> pbar(STEPS, 0, PROGRESS_BAR_LENGTH);
 
+	std::vector<sim::Snapshot> snaps;
+	snaps.reserve(STEPS);
+
+	// Simulation loop.
 	for(index_t i = 0; i != STEPS; ++i){
-		std::stringstream ss;
-		ss << "dump/" << i+1 << ".bmp";
-		
 		if(ConsoleSettings.save_bitmaps)
-			sd.draw(viewer.getSnapshot(), ss.str());
+			snaps.push_back(viewer.getSnapshot());
+
 		pchart.update();
 		ms.update();
+
 		simul.runStep();
 
 		if(ConsoleSettings.signal_progress){
@@ -85,8 +92,38 @@ int main(int argc, char **argv){
 		}
 	}
 
+	std::cout << '\n';
+
+	// Final operations.
 	ms.saveToFile("dump/cell_20x5.txt");
 	pchart.saveToFile("dump/population.bmp");
+
+	// Save all collected bitmaps. Use multithreading to speed up the process.
+	if(ConsoleSettings.save_bitmaps){
+		const int MAX_THREADS = std::thread::hardware_concurrency();
+		std::vector<std::thread> threads;
+		ProgressBar<int> pbar_bmp(MAX_THREADS, 0, PROGRESS_BAR_LENGTH);
+
+		// Construct threads.
+		for(int i = 0; i != MAX_THREADS; ++i){
+			int p = i * snaps.size() / MAX_THREADS;
+			int q = std::min((i+1)*snaps.size()/MAX_THREADS, snaps.size());
+
+			threads.push_back(std::thread(thread_saveBitmaps, snaps, p, q));
+		}
+		
+		std::cout << pbar_bmp << '\r';
+		std::cout.flush();
+
+		// Join threads.
+		for(auto &t : threads){
+			t.join();
+			pbar_bmp.shift(1);
+			std::cout << pbar_bmp << '\r';
+			std::cout.flush();
+		}
+	}
+
 	std::cout << '\n';
 }
 
@@ -105,7 +142,7 @@ void processArgc(int argc, char **argv){
 		else if(argv[i] == std::string{"--steps"}){
 			// Read next argument as number of steps.
 			if(i == argc-1)
-				sim::Output::printWarning("Number of steps not given. Default: {}.", STEPS);
+				sim::Output::printWarning("Number of steps not provided. Default: {}.", STEPS);
 			else{
 				try{
 					++i;
@@ -117,6 +154,25 @@ void processArgc(int argc, char **argv){
 		}
 		else
 			sim::Output::printWarning("Unknown argument: '{}'", argv[i]);
+	}
+}
+
+//************************************************************
+
+void thread_saveBitmaps(
+	const std::vector<sim::Snapshot> &v, int p, int q){
+
+	if(p > q)
+		return;
+	
+	std::stringstream ss;
+	sim::SnapshotDrawer sd(
+		sim::PEDESTRIANS|sim::WALLS|sim::EXITS|sim::DYNAMIC_FIELD|sim::HAPPINESS, 8);
+
+	for(int i = p; i != q; ++i){
+		ss.str("");
+		ss << "dump/" << i+1 << ".bmp";
+		sd.draw(v[i], ss.str());
 	}
 }
 
