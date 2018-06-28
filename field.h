@@ -69,8 +69,20 @@ public:
 	}
 
 	// Getters.
-
 	inline size_type dimension() const { return size; }
+
+	T sum() const {
+		// Get sum of all the elements. Based on Kahan summation algorithm.
+		T result = T();
+		T c = T();
+		for(index_t i = 0; i != size*size; ++i){
+			T y = data[i] - c;
+			T t = result + y;
+			c = t - result - y;
+			result = t;
+		}
+		return result;
+	}
 
 	// Setters.
 	inline void setDefaultDummyState(const T &value){
