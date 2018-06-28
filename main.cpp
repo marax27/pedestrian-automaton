@@ -44,10 +44,10 @@ int main(int argc, char **argv){
 
 	// Load files.
 	sim::Snapshot shot;
-	shot.readFromFile("inputs/r40.map");
+	shot.readFromFile("inputs/evac_room.map");
 
 	sim::Config conf;
-	conf.readFromFile("inputs/iter4.conf");
+	conf.readFromFile("inputs/standard_settings.conf");
 
 	processArgc(argc, argv);
 
