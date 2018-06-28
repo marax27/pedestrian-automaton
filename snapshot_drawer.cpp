@@ -9,9 +9,9 @@ void SnapshotDrawer::draw(const Snapshot &snapshot, const std::string &filename)
 	const index_t DIM = snapshot.dimension;
 	JiMP2::BMP bmp(DIM*cell_size, DIM*cell_size);
 
-	auto fillCell = [&DIM, &bmp](vec2 pos, Colour clr){
-		bmp.drawFillRect(Point(DIM*pos.x, DIM*pos.y),
-			Point(DIM*(pos.x+1), DIM*(pos.y+1)), clr);
+	auto fillCell = [&bmp, this](vec2 pos, Colour clr){
+		bmp.drawFillRect(Point(cell_size*pos.x, cell_size*pos.y),
+			Point(cell_size*(pos.x+1), cell_size*(pos.y+1)), clr);
 	};
 
 	if(flags & PEDESTRIANS){
@@ -19,19 +19,26 @@ void SnapshotDrawer::draw(const Snapshot &snapshot, const std::string &filename)
 			// auto u = p.second.getPosition();
 			// Output::printWarning("Attempt: ({}, {}) -- [{}, {}]/[{}, {}]", u.x, u.y, DIM*u.x,DIM*u.y, DIM*(u.x+1), DIM*(u.y+1));
 
-			fillCell(p.second.getPosition(), Colour::greyScale(0));
+			Colour clr;
+			if(flags & HAPPINESS)
+				clr = p.second.isHappy() 
+				      ? Colour{0,0x56,0x11} : Colour{0x73,0,0};
+			else
+				clr = Colour::greyScale(0);
+
+			fillCell(p.second.getPosition(), clr);
 		}
 	}
 	if(flags & DYNAMIC_FIELD){
 		const auto &df = snapshot.dynamic_field;
 		for(index_t y = 0; y != DIM; ++y){
 			for(index_t x = 0; x != DIM; ++x){
-				int d = DIM/4;
+				int d = cell_size/4;
 				int t = 255 - 20*df(x, y);
 				uint8_t ut = static_cast<uint8_t>(t<0 ? 0 : t);
 
-				bmp.drawFillRect(Point(x*DIM+d, y*DIM+d),
-					Point(DIM*(x+1)-d, DIM*(y+1)-d), {0xff, ut, ut});
+				bmp.drawFillRect(Point(x*cell_size+d, y*cell_size+d),
+					Point(cell_size*(x+1)-d, cell_size*(y+1)-d), {0xff, ut, ut});
 			}
 		}
 	}

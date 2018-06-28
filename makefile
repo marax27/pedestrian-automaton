@@ -1,5 +1,5 @@
 CPP = g++
-FLAGS = -Wall -Wextra -pedantic -std=c++17 -O3
+FLAGS = -Wall -Wextra -pedantic -std=c++17 -O3 -pthread
 PROJ_NAME = project
 OBJS = main.o snapshot.o config.o simulation.o bmp.o snapshot_drawer.o
 

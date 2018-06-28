@@ -49,19 +49,38 @@ void Simulation::runStep(){
 		pos = {pos.x + new_pos.x - 1, pos.y + new_pos.y - 1};
 		data.pedestrians.at(id).setPosition(pos);
 
-		// Increment dynamic field of a cell now occupied by a pedestrian,
-		// unless pedestrian didn't move at all.
-		if(new_pos != vec2{1, 1}){
-			fp_t heterogeneity = 0.0f;
-			fp_t sum = 0.0f;
-			for(sim::index_t i = 0; i != 9; ++i)
-				sum += P(i%3, (i - i%3)/3);
-			for(sim::index_t i = 0; i != 9; ++i)
-				heterogeneity += squared(P(i%3, (i - i%3)/3));
-			heterogeneity = 1 - exp(-8.0*(heterogeneity / sum));
+		// Determine if step should increase/decrease happiness.
+		// 1st approach: compare value of dynamic field in new_pos
+		// with average value of P.
+		// Assume that not moving at all lowers happiness.
+		fp_t sum = 0.0f, avg;
+		int n = 0;
+		vec2 current_pos;
+		for(index_t i = 0; i != 9; ++i){
+			index_t _x = i%3, _y = (i - i%3)/3;
 
+			// Take into account fields that are unoccupied.
+			if(S(_x,_y) && N(_x,_y) && vec2(_x,_y) != vec2(1,1)){
+				sum += P(current_pos.x, current_pos.y);
+				++n;
+			}
+		}
+		if(!n)  //no way to go
+			avg = std::numeric_limits<fp_t>::infinity();
+		else
+			avg = sum / n;
+		
+		// Maybe '>= avg'?
+		if(P(new_pos.x, new_pos.y) > avg && new_pos != vec2(1,1))
+			data.pedestrians[id].increaseHappiness();  //increase happiness.
+		else
+			data.pedestrians[id].decreaseHappiness();  //decrease happiness.
+
+		// If pedestrian's happy, increment dynamic field
+		// of a cell now occupied by them.
+		if(data.pedestrians[id].isHappy()){
 			auto &cell = data.dynamic_field.at(pos.x, pos.y);
-			cell += heterogeneity * config.dynamic_step;
+			cell += config.dynamic_step;
 		}
 
 		pqueue->pop();

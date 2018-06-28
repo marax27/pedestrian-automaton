@@ -4,6 +4,7 @@
 // A representation of a single pedestrian.
 
 #include "misc.h"
+#include "happiness.h"
 
 namespace sim{
 
@@ -20,12 +21,17 @@ public:
 		position = new_pos;
 	}
 
+	void increaseHappiness(){ happiness.increase(); }
+	void decreaseHappiness(){ happiness.decrease(); }
+	bool isHappy() const { return happiness.isHappy(); }
+
 	bool operator==(const Pedestrian &p) const {
 		return position == p.position;
 	}
 
 private:
 	vec2 position;
+	happy_t happiness;
 };
 
 }

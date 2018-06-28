@@ -14,7 +14,7 @@ enum e_DrawFlag : uint8_t {
 	WALLS = 2,
 	EXITS = 4,
 	DYNAMIC_FIELD = 8,
-	// PATHS = 16
+	HAPPINESS = 16
 };
 typedef uint8_t DrawingFlags;
 //------------------------------
@@ -22,14 +22,14 @@ typedef uint8_t DrawingFlags;
 class SnapshotDrawer{
 public:
 
-	SnapshotDrawer(DrawingFlags drawing_flags)
-		: flags(drawing_flags), cell_size(32) {}
+	SnapshotDrawer(DrawingFlags drawing_flags, uint16_t _cell_size = 32)
+		: flags(drawing_flags), cell_size(_cell_size) {}
 
 	void draw(const Snapshot &snapshot, const std::string &filename);
 
 private:
 	DrawingFlags flags;
-	int cell_size;
+	uint16_t cell_size;
 };
 
 }
