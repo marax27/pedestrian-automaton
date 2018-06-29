@@ -36,6 +36,9 @@ namespace{
 
 	const int PROGRESS_BAR_LENGTH = 40;
 
+	std::string SNAPSHOT_FILENAME = "inputs/evac_room.map";
+	std::string CONFIG_FILENAME = "inputs/standard_settings.conf";
+
 	struct{
 		bool save_bitmaps = false,
 		     signal_progress = true;
@@ -47,14 +50,14 @@ namespace{
 int main(int argc, char **argv){
 	srand(time(NULL));
 
+	processArgc(argc, argv);
+
 	// Load files.
 	sim::Snapshot shot;
-	shot.readFromFile("inputs/evac_room.map");
+	shot.readFromFile(SNAPSHOT_FILENAME);
 
 	sim::Config conf;
-	conf.readFromFile("inputs/standard_settings.conf");
-
-	processArgc(argc, argv);
+	conf.readFromFile(CONFIG_FILENAME);
 
 	// Initialize simulation.
 	sim::Simulation simul(shot, conf);
@@ -63,13 +66,15 @@ int main(int argc, char **argv){
 	cout << "Size: " << shot.dimension << 'x' << shot.dimension << '\n'
 	     << shot.exits.size() << " exits.\n"
 		 << shot.pedestrians.size() << " pedestrians.\n"
-		 << shot.walls.size() << " walls.\n";
+		 << shot.walls.size() << " walls.\n"
+		 << "Map: " << SNAPSHOT_FILENAME << '\n'
+		 << "Config: " << CONFIG_FILENAME << '\n';
 
 	// Initialize viewer objects.
 	sim::Simulation::Viewer viewer(simul);
 	sim::PopulationChart pchart(simul, {0xff, 0, 0});
-	sim::MotionSensor ms(simul, {19, 2});
-	sim::DynamicSensor ds(simul, {19, 2}, {0x22, 0x22, 0x99});  //before the exit
+	sim::MotionSensor ms(simul, {19, 2});  //close to the exit
+	sim::DynamicSensor ds(simul, {19, 2}, {0x22, 0x22, 0x99});
 
 	ProgressBar<int> pbar(STEPS, 0, PROGRESS_BAR_LENGTH);
 
@@ -103,6 +108,9 @@ int main(int argc, char **argv){
 
 	// Save all collected bitmaps. Use multithreading to speed up the process.
 	if(ConsoleSettings.save_bitmaps){
+		// Save the last snapshot as .map file.
+		snaps.back().writeToFile("dump/last.map");
+
 		const int MAX_THREADS = std::thread::hardware_concurrency();
 		std::vector<std::thread> threads;
 		ProgressBar<int> pbar_bmp(MAX_THREADS, 0, PROGRESS_BAR_LENGTH);
@@ -154,6 +162,18 @@ void processArgc(int argc, char **argv){
 					sim::Output::printWarning("Invalid number of steps. Default: {}.", STEPS);
 				}
 			}
+		}
+		else if(argv[i] == std::string{"--map"}){
+			if(i == argc-1)
+				sim::Output::printWarning("Map filename not provided. Default: {}.", SNAPSHOT_FILENAME);
+			else
+				SNAPSHOT_FILENAME = argv[++i];
+		}
+		else if(argv[i] == std::string{"--config"}){
+			if(i == argc-1)
+				sim::Output::printWarning("Simulation config not provided. Default: {}.", CONFIG_FILENAME);
+			else
+				CONFIG_FILENAME = argv[++i];
 		}
 		else
 			sim::Output::printWarning("Unknown argument: '{}'", argv[i]);

@@ -45,6 +45,11 @@ void Snapshot::readFromFile(const std::string &filename){
 					Output::printError(err1 + "Could not have read map dimension.");
 					throw FileFormat::FileReadException();
 				}
+
+				this->dynamic_field = Field<fp_t>(dim);
+				for(index_t y = 0; y != dim; ++y)
+					for(index_t x = 0; x != dim; ++x)
+						dynamic_field(y, x) = 0.0f;
 			}
 			else if(token == "map:"){
 				if(!dim){
@@ -63,6 +68,31 @@ void Snapshot::readFromFile(const std::string &filename){
 						throw FileFormat::FileReadException();
 					}
 					map.push_back(token);
+				}
+			}
+			else if(token == "dynamic:"){
+				if(!dim){
+					Output::printError(err1 + "Could not have read map dimension.");
+					throw FileFormat::FileReadException();
+				}
+
+				// Read values of dynamic field.
+				for(index_t y = 0; y != dim; ++y){
+					// Read line.
+					std::getline(reader, line);
+
+					if(reader.fail()){
+						Output::printError(err1 + "Failed to read {}. row of dynamic field ({} expected).", y+1, dim);
+						throw FileFormat::FileReadException();
+					}
+					// Read each value.
+					std::istringstream ss{line};
+					for(index_t x = 0; x != dim; ++x)
+						ss >> dynamic_field(y, x);
+					if(ss.fail()){
+						Output::printError(err1 + "Row {} is of invalid length ({} expected).", y+1, dim);
+						throw FileFormat::FileReadException();
+					}
 				}
 			}
 		}
@@ -90,11 +120,6 @@ void Snapshot::readFromFile(const std::string &filename){
 			}
 		}
 	}
-
-	this->dynamic_field = Field<fp_t>(this->dimension);
-	for(index_t i = 0; i != dimension; ++i)
-		for(index_t j = 0; j != dimension; ++j)
-			dynamic_field(j, i) = 0.0f;
 
 }
 
@@ -125,6 +150,16 @@ void Snapshot::writeToFile(const std::string &filename) const {
 	writer << "map:\n";
 	for(const auto &r : rows)
 		writer << r << '\n';
+	
+	// Dynamic field.
+	writer << "\ndynamic:\n";
+	for(index_t y = 0; y != dimension; ++y){
+		for(index_t x = 0; x != dimension; ++x)
+			writer << dynamic_field(y, x) << ' ';
+		writer << '\n';
+	}
+
+	writer.close();
 }
 
 
