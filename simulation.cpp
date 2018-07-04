@@ -41,7 +41,11 @@ void Simulation::runStep(){
 		}
 		std::cerr << '\n';*/
 
-		vec2 new_pos = randomMatrixElement(P);
+		vec2 new_pos;
+		// if(data.pedestrians[id].isHappy())
+		new_pos = randomMatrixElement(P);
+		// else  //random roaming
+		// new_pos = randomMatrixElement(P.as<bool>().as<fp_t>());
 
 		// Coords of new_pos contains values from {0, 1, 2},
 		// which represent pedestrian's offset:  {-1, 0, 1}.

@@ -1,10 +1,10 @@
 CPP = g++
-FLAGS = -Wall -Wextra -pedantic -std=c++17 -O3 -lpthread
+FLAGS = -Wall -Wextra -pedantic -std=c++17 -O3
 PROJ_NAME = project
 OBJS = main.o snapshot.o config.o simulation.o bmp.o snapshot_drawer.o happiness.o cellular_sensor.cpp
 
 all: $(OBJS)
-	$(CPP) $(FLAGS) $(OBJS) -o $(PROJ_NAME)
+	$(CPP) $(FLAGS) $(OBJS) -lpthread -o $(PROJ_NAME)
 
 main.o: main.cpp matrix.h misc.h output.h pedestrian.h progress_bar.h field.h chart.h updateable.h snapshot_drawer.h cellular_sensor.h
 	$(CPP) $(FLAGS) main.cpp -c -o main.o
